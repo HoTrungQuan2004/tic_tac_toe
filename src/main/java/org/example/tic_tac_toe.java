@@ -13,7 +13,7 @@ interface GameCommand {
 class QuitCommand implements GameCommand {
     @Override
     public boolean canHandle(String input) {
-        return "q".equalsIgnoreCase(input.trim());
+        return "q".equals(input.trim());
     }
 
     @Override
@@ -149,7 +149,7 @@ class HumanPlayer extends Player {
                 int choice = Integer.parseInt(choiceStr);
 
                 if (choice < 1 || choice > 9) {
-                    printer.println("Invalid input, please try again (1-9)!");
+                    printer.println("Please, input a valid number [1-9]");
                     continue;
                 }
 
@@ -160,8 +160,7 @@ class HumanPlayer extends Player {
                 }
 
             } catch (NumberFormatException e) {
-                printer.println("Error: Please enter a valid number, not text!");
-                printer.println("Player" + id + " turn");
+                printer.println("Please, input a valid number [1-9]");
             }
         }
     }
@@ -255,6 +254,8 @@ public class tic_tac_toe {
 
         // For Black-box test
 //        if (args.length > 0) {
+//            InputProcessor.process(args[0].trim());
+//
 //            try {
 //                start = Integer.parseInt(args[0].trim());
 //                if (start != 1 && start != 2) {
