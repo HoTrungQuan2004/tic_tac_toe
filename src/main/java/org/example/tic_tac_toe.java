@@ -6,14 +6,14 @@ import java.io.PrintStream;
 import java.util.Scanner;
 
 interface GameCommand {
-    boolean canHandle(String input);
+    boolean canHandle(String input, boolean hasNext);
     void execute();
 }
 
 class QuitCommand implements GameCommand {
     @Override
-    public boolean canHandle(String input) {
-        return "q".equals(input.trim());
+    public boolean canHandle(String input,  boolean hasNext) {
+        return !hasNext || "q".equals(input);
     }
 
     @Override
@@ -139,14 +139,16 @@ class HumanPlayer extends Player {
     public int takeTurn(Board board) {
         while (true) {
             printer.println("Player" + id + " turn");
-            String choiceStr = scanner.nextLine();
 
-            if (InputProcessor.process(choiceStr)) {
+            boolean hasNext = scanner.hasNextLine();
+            String choiceStr = hasNext ? scanner.nextLine() : null;
+
+            if (InputProcessor.process(choiceStr, hasNext)) {
                 continue;
             }
 
             try {
-                int choice = Integer.parseInt(choiceStr);
+                int choice = Integer.parseInt(choiceStr.trim());
 
                 if (choice < 1 || choice > 9) {
                     printer.println("Please, input a valid number [1-9]");
@@ -238,13 +240,14 @@ public class tic_tac_toe {
         // Normal run
         while (true) {
             try {
-                String input = keyboard.nextLine();
+                boolean hasNext = keyboard.hasNextLine();
+                String input = hasNext ? keyboard.nextLine() : null;
 
-                if (InputProcessor.process(input)) {
+                if (InputProcessor.process(input, hasNext)) {
                     continue;
                 }
 
-                start = Integer.parseInt(input);
+                start = Integer.parseInt(input.trim());
                 if (start == 1 || start == 2) break;
                 System.out.println("Please, input a valid option [1-2]");
             } catch (NumberFormatException e) {
@@ -254,7 +257,7 @@ public class tic_tac_toe {
 
         // For Black-box test
 //        if (args.length > 0) {
-//            InputProcessor.process(args[0].trim());
+//            InputProcessor.process(args[0]);
 //
 //            try {
 //                start = Integer.parseInt(args[0].trim());

@@ -10,9 +10,9 @@ public class InputProcessor {
         Commands.add(new QuitCommand() {});
     }
 
-    public static boolean process(String input) {
+    public static boolean process(String input, boolean hasNext) {
         for (GameCommand command : Commands) {
-            if (command.canHandle(input)) {
+            if (command.canHandle(input, hasNext)) {
                 command.execute();
                 return true;
             }
