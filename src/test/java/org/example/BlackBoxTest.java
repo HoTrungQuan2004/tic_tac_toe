@@ -13,30 +13,6 @@ import java.util.logging.Logger;
 import static org.junit.jupiter.api.Assertions.*;
 
 class gameTest {
-    // Old
-//    private final PrintStream originalOut = System.out;
-//    private PipedOutputStream outputStream;
-//    private BufferedReader scanner;
-//
-//    @BeforeEach
-//    void setUp() {
-//        outputStream = new PipedOutputStream();
-//        try {
-//            PipedInputStream inputStream = new PipedInputStream(outputStream);
-//            scanner = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
-//        } catch (IOException ex) {
-//            Logger.getLogger(Player.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//
-//        System.setOut(new PrintStream(outputStream));
-//    }
-//
-//    @AfterEach
-//    void tearDown() {
-//        System.setOut(originalOut);
-//    }
-
-    // New
     private final PrintStream originalOut = System.out;
     private final InputStream originalIn = System.in;
 
@@ -84,7 +60,7 @@ class gameTest {
         assertEquals("|0|0|0|", scanner.readLine());
         assertEquals("|0|0|0|", scanner.readLine());
         assertEquals("|0|0|0|", scanner.readLine());
-        assertEquals("Player1 turn", scanner.readLine());
+        assertEquals("Player#1's turn", scanner.readLine());
 
         inputPipe.write("q\n".getBytes(StandardCharsets.UTF_8));
         inputPipe.flush();
@@ -104,7 +80,7 @@ class gameTest {
         assertEquals("|0|0|0|", scanner.readLine());
         assertEquals("|0|0|0|", scanner.readLine());
         assertEquals("|0|0|0|", scanner.readLine());
-        assertEquals("Player2 turn", scanner.readLine());
+        assertEquals("Player#2's turn", scanner.readLine());
     }
 
     @Test
@@ -205,17 +181,17 @@ class gameTest {
         inputPipe.write("abc\n".getBytes(StandardCharsets.UTF_8));
         inputPipe.flush();
         assertEquals("Please, input a valid number [1-9]", scanner.readLine());
-        assertEquals("Player1 turn", scanner.readLine());
+        assertEquals("Player#1's turn", scanner.readLine());
 
         inputPipe.write("@\n".getBytes(StandardCharsets.UTF_8));
         inputPipe.flush();
         assertEquals("Please, input a valid number [1-9]", scanner.readLine());
-        assertEquals("Player1 turn", scanner.readLine());
+        assertEquals("Player#1's turn", scanner.readLine());
 
         inputPipe.write("\n".getBytes(StandardCharsets.UTF_8));
         inputPipe.flush();
         assertEquals("Please, input a valid number [1-9]", scanner.readLine());
-        assertEquals("Player1 turn", scanner.readLine());
+        assertEquals("Player#1's turn", scanner.readLine());
 
         inputPipe.write("q\n".getBytes(StandardCharsets.UTF_8));
         inputPipe.flush();
@@ -253,17 +229,17 @@ class gameTest {
         inputPipe.write("Q\n".getBytes(StandardCharsets.UTF_8));
         inputPipe.flush();
         assertEquals("Please, input a valid number [1-9]", scanner.readLine());
-        assertEquals("Player1 turn", scanner.readLine());
+        assertEquals("Player#1's turn", scanner.readLine());
 
         inputPipe.write(" q\n".getBytes(StandardCharsets.UTF_8));
         inputPipe.flush();
         assertEquals("Please, input a valid number [1-9]", scanner.readLine());
-        assertEquals("Player1 turn", scanner.readLine());
+        assertEquals("Player#1's turn", scanner.readLine());
 
         inputPipe.write("q \n".getBytes(StandardCharsets.UTF_8));
         inputPipe.flush();
         assertEquals("Please, input a valid number [1-9]", scanner.readLine());
-        assertEquals("Player1 turn", scanner.readLine());
+        assertEquals("Player#1's turn", scanner.readLine());
 
         inputPipe.write("q\n".getBytes(StandardCharsets.UTF_8));
         inputPipe.flush();
@@ -284,17 +260,17 @@ class gameTest {
         inputPipe.write("0\n".getBytes(StandardCharsets.UTF_8));
         inputPipe.flush();
         assertEquals("Please, input a valid number [1-9]", scanner.readLine());
-        assertEquals("Player1 turn", scanner.readLine());
+        assertEquals("Player#1's turn", scanner.readLine());
 
         inputPipe.write("10\n".getBytes(StandardCharsets.UTF_8));
         inputPipe.flush();
         assertEquals("Please, input a valid number [1-9]", scanner.readLine());
-        assertEquals("Player1 turn", scanner.readLine());
+        assertEquals("Player#1's turn", scanner.readLine());
 
         inputPipe.write("-3\n".getBytes(StandardCharsets.UTF_8));
         inputPipe.flush();
         assertEquals("Please, input a valid number [1-9]", scanner.readLine());
-        assertEquals("Player1 turn", scanner.readLine());
+        assertEquals("Player#1's turn", scanner.readLine());
 
         inputPipe.write("q\n".getBytes(StandardCharsets.UTF_8));
         inputPipe.flush();
@@ -320,15 +296,15 @@ class gameTest {
         inputPipe.flush();
         skipLines(4, scanner);
         assertEquals("This cell is occupied, please choose another cell!", scanner.readLine());
-        assertEquals("Player1 turn", scanner.readLine());
+        assertEquals("Player#1's turn", scanner.readLine());
 
         inputPipe.write("q\n".getBytes(StandardCharsets.UTF_8));
         inputPipe.flush();
     }
 
     @Test
-    @DisplayName("TS-013: Human win detection on row/column/diagonal")
-    void testHumanWinDetectionOnRowAndColumn() throws IOException {
+    @DisplayName("TS-013: Human win condition")
+    void testHumanWinCondition() throws IOException {
         Thread game = new Thread(() -> {
             try {
                 tic_tac_toe.main(new String[] {"1"});
@@ -345,6 +321,271 @@ class gameTest {
         assertEquals("|0|0|0|", scanner.readLine());
         assertEquals("|1|1|1|", scanner.readLine());
         assertEquals("Player1 won", scanner.readLine());
+    }
+
+    @Test
+    @DisplayName("TS-014: Computer win detection")
+    void testComputerWinDetection() throws IOException {
+        Thread game = new Thread(() -> {
+            try {
+                tic_tac_toe.main(new String[] {"1"});
+            } catch (Exception e) {}
+        });
+        game.start();
+
+        skipLines(5, scanner);
+        inputPipe.write("4\n7\n6\n".getBytes(StandardCharsets.UTF_8));
+        inputPipe.flush();
+        skipLines(20, scanner);
+        assertEquals("|2|2|2|", scanner.readLine());
+        assertEquals("|1|0|1|", scanner.readLine());
+        assertEquals("|1|0|0|", scanner.readLine());
+        assertEquals("Player2 won", scanner.readLine());
+    }
+
+    @Test
+    @DisplayName("TS-015: Draw condition after human move")
+    void testDrawConditionAfterHumanMove() throws IOException {
+        Thread game = new Thread(() -> {
+            try {
+                tic_tac_toe.main(new String[] {"1"});
+            } catch (Exception e) {}
+        });
+        game.start();
+
+        skipLines(5, scanner);
+
+        inputPipe.write("2\n4\n5\n7\n9\n".getBytes(StandardCharsets.UTF_8));
+        inputPipe.flush();
+        skipLines(32, scanner);
+        assertEquals("|2|1|2|", scanner.readLine());
+        assertEquals("|1|1|2|", scanner.readLine());
+        assertEquals("|1|2|1|", scanner.readLine());
+        assertEquals("Draw", scanner.readLine());
+    }
+
+    @Test
+    @DisplayName("TS-016: Draw condition after computer move")
+    void testDrawConditionAfterComputerMove() throws IOException {
+        Thread game = new Thread(() -> {
+            try {
+                tic_tac_toe.main(new String[] {"2"});
+            } catch (Exception e) {}
+        });
+        game.start();
+
+        skipLines(5, scanner);
+
+        inputPipe.write("2\n4\n7\n9\n".getBytes(StandardCharsets.UTF_8));
+        inputPipe.flush();
+        skipLines(32, scanner);
+        assertEquals("|2|1|2|", scanner.readLine());
+        assertEquals("|1|2|2|", scanner.readLine());
+        assertEquals("|1|2|1|", scanner.readLine());
+        assertEquals("Draw", scanner.readLine());
+    }
+
+    @Test
+    @DisplayName("TS-017: Computer chooses first available cell")
+    void testComputerChoosesFirstAvailableCell() throws IOException {
+        Thread game = new Thread(() -> {
+            try {
+                tic_tac_toe.main(new String[] {"2"});
+            } catch (Exception e) {}
+        });
+        game.start();
+
+        skipLines(5, scanner);
+
+        assertEquals("|2|0|0|", scanner.readLine());
+        assertEquals("|0|0|0|", scanner.readLine());
+        assertEquals("|0|0|0|", scanner.readLine());
+        assertEquals("Player#1's turn", scanner.readLine());
+
+        inputPipe.write("2\n".getBytes(StandardCharsets.UTF_8));
+        inputPipe.flush();
+        skipLines(4, scanner);
+        assertEquals("|2|1|2|", scanner.readLine());
+        assertEquals("|0|0|0|", scanner.readLine());
+        assertEquals("|0|0|0|", scanner.readLine());
+        assertEquals("Player#1's turn", scanner.readLine());
+
+        inputPipe.write("q\n".getBytes(StandardCharsets.UTF_8));
+        inputPipe.flush();
+    }
+
+    @Test
+    @DisplayName("TS-018: Board integrity after every move")
+    void testBoardIntegrityAfterEveryMove() throws IOException {
+        Thread game = new Thread(() -> {
+            try {
+                tic_tac_toe.main(new String[] {"1"});
+            } catch (Exception e) {}
+        });
+        game.start();
+
+        skipLines(5, scanner);
+
+        inputPipe.write("2\n4\n5\n7\n9\n".getBytes(StandardCharsets.UTF_8));
+        inputPipe.flush();
+
+        assertEquals("|0|1|0|", scanner.readLine());
+        assertEquals("|0|0|0|", scanner.readLine());
+        assertEquals("|0|0|0|", scanner.readLine());
+        assertEquals("Player#2's turn", scanner.readLine());
+
+        assertEquals("|2|1|0|", scanner.readLine());
+        assertEquals("|0|0|0|", scanner.readLine());
+        assertEquals("|0|0|0|", scanner.readLine());
+        assertEquals("Player#1's turn", scanner.readLine());
+
+        assertEquals("|2|1|0|", scanner.readLine());
+        assertEquals("|1|0|0|", scanner.readLine());
+        assertEquals("|0|0|0|", scanner.readLine());
+        assertEquals("Player#2's turn", scanner.readLine());
+
+        assertEquals("|2|1|2|", scanner.readLine());
+        assertEquals("|1|0|0|", scanner.readLine());
+        assertEquals("|0|0|0|", scanner.readLine());
+        assertEquals("Player#1's turn", scanner.readLine());
+
+        assertEquals("|2|1|2|", scanner.readLine());
+        assertEquals("|1|1|0|", scanner.readLine());
+        assertEquals("|0|0|0|", scanner.readLine());
+        assertEquals("Player#2's turn", scanner.readLine());
+
+        assertEquals("|2|1|2|", scanner.readLine());
+        assertEquals("|1|1|2|", scanner.readLine());
+        assertEquals("|0|0|0|", scanner.readLine());
+        assertEquals("Player#1's turn", scanner.readLine());
+
+        assertEquals("|2|1|2|", scanner.readLine());
+        assertEquals("|1|1|2|", scanner.readLine());
+        assertEquals("|1|0|0|", scanner.readLine());
+        assertEquals("Player#2's turn", scanner.readLine());
+
+        assertEquals("|2|1|2|", scanner.readLine());
+        assertEquals("|1|1|2|", scanner.readLine());
+        assertEquals("|1|2|0|", scanner.readLine());
+        assertEquals("Player#1's turn", scanner.readLine());
+
+        assertEquals("|2|1|2|", scanner.readLine());
+        assertEquals("|1|1|2|", scanner.readLine());
+        assertEquals("|1|2|1|", scanner.readLine());
+        assertEquals("Draw", scanner.readLine());
+    }
+
+    @Test
+    @DisplayName("TS-019: Turn prompt sequence correctness")
+    void testTurnPromptSequenceCorrectness() throws IOException {
+        Thread game = new Thread(() -> {
+            try {
+                tic_tac_toe.main(new String[] {"1"});
+            } catch (Exception e) {}
+        });
+        game.start();
+
+        skipLines(5, scanner);
+
+        inputPipe.write("1\nabc\n3\n1\n9\n".getBytes(StandardCharsets.UTF_8));
+        inputPipe.flush();
+        assertEquals("|1|0|0|", scanner.readLine());
+        assertEquals("|0|0|0|", scanner.readLine());
+        assertEquals("|0|0|0|", scanner.readLine());
+        assertEquals("Player#2's turn", scanner.readLine());
+
+        skipLines(4, scanner);
+
+        assertEquals("Please, input a valid number [1-9]", scanner.readLine());
+        assertEquals("Player#1's turn", scanner.readLine());
+
+        assertEquals("|1|2|1|", scanner.readLine());
+        assertEquals("|0|0|0|", scanner.readLine());
+        assertEquals("|0|0|0|", scanner.readLine());
+        assertEquals("Player#2's turn", scanner.readLine());
+
+        skipLines(4, scanner);
+
+        assertEquals("This cell is occupied, please choose another cell!", scanner.readLine());
+        assertEquals("Player#1's turn", scanner.readLine());
+
+        assertEquals("|1|2|1|", scanner.readLine());
+        assertEquals("|2|0|0|", scanner.readLine());
+        assertEquals("|0|0|1|", scanner.readLine());
+        assertEquals("Player#2's turn", scanner.readLine());
+
+        inputPipe.write("q\n".getBytes(StandardCharsets.UTF_8));
+        inputPipe.flush();
+    }
+
+    @Test
+    @DisplayName("TS-020: End states stop program")
+    void testStopProgram() throws IOException, InterruptedException {
+        Thread gameHumanWin = new Thread(() -> {
+            try {
+                tic_tac_toe.main(new String[] {"1"});
+            } catch (Exception e) {}
+        });
+        gameHumanWin.start();
+        skipLines(5, scanner);
+        inputPipe.write("7\n8\n9\n".getBytes(StandardCharsets.UTF_8));
+        inputPipe.flush();
+        skipLines(16, scanner);
+        assertEquals("|2|2|0|", scanner.readLine());
+        assertEquals("|0|0|0|", scanner.readLine());
+        assertEquals("|1|1|1|", scanner.readLine());
+        assertEquals("Player1 won", scanner.readLine());
+        gameHumanWin.join(1000);
+        tearDown();
+
+        setUp();
+        Thread gameComWin = new Thread(() -> {
+            try {
+                tic_tac_toe.main(new String[] {"1"});
+            } catch (Exception e) {}
+        });
+        gameComWin.start();
+        skipLines(5, scanner);
+        inputPipe.write("4\n7\n6\n".getBytes(StandardCharsets.UTF_8));
+        inputPipe.flush();
+        skipLines(20, scanner);
+        assertEquals("|2|2|2|", scanner.readLine());
+        assertEquals("|1|0|1|", scanner.readLine());
+        assertEquals("|1|0|0|", scanner.readLine());
+        assertEquals("Player2 won", scanner.readLine());
+        gameComWin.join(1000);
+        tearDown();
+
+        setUp();
+        Thread gameDraw = new Thread(() -> {
+            try {
+                tic_tac_toe.main(new String[] {"1"});
+            } catch (Exception e) {}
+        });
+        gameDraw.start();
+        skipLines(5, scanner);
+        inputPipe.write("2\n4\n5\n7\n9\n".getBytes(StandardCharsets.UTF_8));
+        inputPipe.flush();
+        skipLines(32, scanner);
+        assertEquals("|2|1|2|", scanner.readLine());
+        assertEquals("|1|1|2|", scanner.readLine());
+        assertEquals("|1|2|1|", scanner.readLine());
+        assertEquals("Draw", scanner.readLine());
+        gameDraw.join(1000);
+        tearDown();
+
+        setUp();
+        Thread gameQuit = new Thread(() -> {
+            try {
+                tic_tac_toe.main(new String[] {"1"});
+            } catch (Exception e) {}
+        });
+        gameQuit.start();
+        skipLines(5, scanner);
+        inputPipe.write("q\n".getBytes(StandardCharsets.UTF_8));
+        inputPipe.flush();
+        assertEquals("End of the game", scanner.readLine());
+        gameQuit.join(1000);
     }
 
     @Test

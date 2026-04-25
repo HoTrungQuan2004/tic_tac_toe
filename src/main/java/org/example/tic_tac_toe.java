@@ -140,7 +140,7 @@ class HumanPlayer extends Player {
     @Override
     public int takeTurn(Board board) {
         while (true) {
-            printer.println("Player" + id + " turn");
+            printer.println("Player#" + id + "'s turn");
 
             boolean hasNext = scanner.hasNextLine();
             String choiceStr = hasNext ? scanner.nextLine() : null;
@@ -180,7 +180,7 @@ class AIPlayer extends Player {
 
     @Override
     public int takeTurn(Board board) {
-        printer.println("Player" + id + " turn");
+        printer.println("Player#" + id + "'s turn");
         int[] empty = board.firstEmptyCell();
         int position = empty[0] * 3 + empty[1] + 1;
         board.placeMove(position, value);
@@ -224,6 +224,7 @@ class  Game {
         }
 
         if (winner == 0) {
+            board.printBoard();
             printer.println("Draw");
         } else {
             board.printBoard();
@@ -249,14 +250,14 @@ public class tic_tac_toe {
 //                    continue;
 //                }
 //
-//                if ( input == "1" || input == "2") {
+//                if ( input.equals("1") || input.equals("2")) {
 //                    start = Integer.parseInt(input.trim());
 //                    break;
 //                }
 //
 //                System.out.println("Please, input a valid option [1-2]");
 //            } catch (NumberFormatException e) {
-//              System.out.println("Please, input a valid option [1-2]");
+//              System.out.println("not int Please, input a valid option [1-2]");
 //            }
 //        }
 
@@ -265,7 +266,7 @@ public class tic_tac_toe {
             InputProcessor.process(args[0], true);
 
             try {
-                if (args[0] != "1" && args[0] != "2") {
+                if ((!args[0].equals("1")) && (!args[0].equals("2"))) {
                     System.out.println("Please, input a valid option [1-2]");
                     return;
                 }
