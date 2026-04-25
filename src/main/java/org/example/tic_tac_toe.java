@@ -10,6 +10,8 @@ interface GameCommand {
     void execute();
 }
 
+class GameQuitException extends RuntimeException {}
+
 class QuitCommand implements GameCommand {
     @Override
     public boolean canHandle(String input,  boolean hasNext) {
@@ -19,7 +21,7 @@ class QuitCommand implements GameCommand {
     @Override
     public void execute() {
         System.out.println("End of the game");
-        System.exit(0);
+        throw new GameQuitException();
     }
 }
 
@@ -225,7 +227,7 @@ class  Game {
             printer.println("Draw");
         } else {
             board.printBoard();
-            printer.println("Player" + winner + " win");
+            printer.println("Player" + winner + " won");
         }
     }
 }
@@ -238,42 +240,45 @@ public class tic_tac_toe {
 
 
         // Normal run
-        while (true) {
-            try {
-                boolean hasNext = keyboard.hasNextLine();
-                String input = hasNext ? keyboard.nextLine() : null;
-
-                if (InputProcessor.process(input, hasNext)) {
-                    continue;
-                }
-
-                start = Integer.parseInt(input.trim());
-                if (start == 1 || start == 2) break;
-                System.out.println("Please, input a valid option [1-2]");
-            } catch (NumberFormatException e) {
-              System.out.println("Please, input a valid option [1-2]");
-            }
-        }
-
-        // For Black-box test
-//        if (args.length > 0) {
-//            InputProcessor.process(args[0]);
-//
+//        while (true) {
 //            try {
-//                start = Integer.parseInt(args[0].trim());
-//                if (start != 1 && start != 2) {
-//                    System.out.println("Please, input a valid option [1-2]");
-//                    return;
+//                boolean hasNext = keyboard.hasNextLine();
+//                String input = hasNext ? keyboard.nextLine() : null;
+//
+//                if (InputProcessor.process(input, hasNext)) {
+//                    continue;
 //                }
-//            } catch (NumberFormatException e) {
+//
+//                if ( input == "1" || input == "2") {
+//                    start = Integer.parseInt(input.trim());
+//                    break;
+//                }
+//
 //                System.out.println("Please, input a valid option [1-2]");
-//                return;
+//            } catch (NumberFormatException e) {
+//              System.out.println("Please, input a valid option [1-2]");
 //            }
 //        }
-//        else {
-//            System.out.println("Please, input a valid option [1-2]");
-//            return;
-//        }
+
+        // For Black-box test
+        if (args.length > 0) {
+            InputProcessor.process(args[0], true);
+
+            try {
+                if (args[0] != "1" && args[0] != "2") {
+                    System.out.println("Please, input a valid option [1-2]");
+                    return;
+                }
+                else start = Integer.parseInt(args[0].trim());
+            } catch (NumberFormatException e) {
+                System.out.println("Please, input a valid option [1-2]");
+                return;
+            }
+        }
+        else {
+            System.out.println("Please, input a valid option [1-2]");
+            return;
+        }
 
         Player player1 = new HumanPlayer(1, keyboard);
         Player player2 = new AIPlayer(2);
