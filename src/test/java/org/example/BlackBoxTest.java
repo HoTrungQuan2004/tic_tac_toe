@@ -589,23 +589,163 @@ class gameTest {
     }
 
     @Test
-    @DisplayName("Test Initial Board Mapping")
-    void testInitialBoardMapping() throws IOException {
-        System.setIn(new ByteArrayInputStream("8\n2\n5".getBytes(StandardCharsets.UTF_8)));
+    @DisplayName("TS-021: Fixed Thread Monitoring")
+    void testInputLoopResilience() throws IOException, InterruptedException {
+        final Throwable[] errorInThread = {null};
 
         Thread game = new Thread(() -> {
             try {
-                tic_tac_toe.main(new String[]{"1"});
-            } catch (IOException ex) {}
+                tic_tac_toe.main(new String[] {"1"});
+            } catch (Throwable e) {
+                if (!e.getClass().getSimpleName().contains("GameQuitException")) {
+                    errorInThread[0] = e;
+                }
+            }
+        });
+
+        game.start();
+        skipLines(5, scanner);
+
+        String fakeInput = "akja\n".repeat(35) + "5\n" + "q\n";
+        inputPipe.write(fakeInput.getBytes(StandardCharsets.UTF_8));
+        inputPipe.flush();
+
+        boolean moveAccepted = false;
+        String line;
+        while ((line = scanner.readLine()) != null) {
+            if (line.contains("|0|1|0|")) {
+                moveAccepted = true;
+            }
+            if (line.contains("End of the game")) break;
+        }
+
+        game.join(2000);
+
+        if (errorInThread[0] != null) {
+            fail("Game thread failed with: " + errorInThread[0].getMessage());
+        }
+
+        assertTrue(moveAccepted, "Game should be responsive and accept valid move '5' after rapid invalid retries");
+    }
+
+    @Test
+    @DisplayName("TS-022: Output consistency with exact required strings")
+    void testOutputConsistency() throws IOException, InterruptedException {
+        Thread invalidArg = new Thread(() -> {
+            try {
+                tic_tac_toe.main(new String[] {"abc\nq\n"});
+            } catch (Exception e) {}
+        });
+        invalidArg.start();
+        assertEquals("Please, input a valid option [1-2]", scanner.readLine());
+        invalidArg.join(1000);
+        tearDown();
+
+        setUp();
+        Thread invalidMove = new Thread(() -> {
+            try {
+                tic_tac_toe.main(new String[] {"1"});
+            } catch (Exception e) {}
+        });
+        invalidMove.start();
+        skipLines(5, scanner);
+        inputPipe.write("abc\nq\n".getBytes(StandardCharsets.UTF_8));
+        inputPipe.flush();
+        assertEquals("Please, input a valid number [1-9]", scanner.readLine());
+        assertEquals("Player#1's turn",  scanner.readLine());
+        invalidMove.join(1000);
+        tearDown();
+
+        setUp();
+        Thread occupiedCell = new Thread(() -> {
+            try {
+                tic_tac_toe.main(new String[] {"1"});
+            } catch (Exception e) {}
+        });
+        occupiedCell.start();
+        skipLines(5, scanner);
+        inputPipe.write("1\n1\nq\n".getBytes(StandardCharsets.UTF_8));
+        inputPipe.flush();
+        skipLines(8, scanner);
+        assertEquals("This cell is occupied, please choose another cell!", scanner.readLine());
+        assertEquals("Player#1's turn", scanner.readLine());
+        occupiedCell.join(1000);
+        tearDown();
+
+        setUp();
+        Thread quit = new Thread(() -> {
+            try {
+                tic_tac_toe.main(new String[] {"1"});
+            } catch (Exception e) {}
+        });
+        quit.start();
+        skipLines(5, scanner);
+        inputPipe.write("q\n".getBytes(StandardCharsets.UTF_8));
+        inputPipe.flush();
+        assertEquals("End of the game", scanner.readLine());
+        quit.join(1000);
+        tearDown();
+
+        setUp();
+        Thread Draw = new Thread(() -> {
+            try {
+                tic_tac_toe.main(new String[] {"1"});
+            } catch (Exception e) {}
+        });
+        Draw.start();
+        skipLines(5, scanner);
+        inputPipe.write("2\n4\n5\n7\n9\n".getBytes(StandardCharsets.UTF_8));
+        inputPipe.flush();
+        skipLines(32, scanner);
+        assertEquals("|2|1|2|", scanner.readLine());
+        assertEquals("|1|1|2|", scanner.readLine());
+        assertEquals("|1|2|1|", scanner.readLine());
+        assertEquals("Draw", scanner.readLine());
+        Draw.join(1000);
+        tearDown();
+
+        setUp();
+        Thread win = new Thread(() -> {
+            try {
+                tic_tac_toe.main(new String[] {"1"});
+            } catch (Exception e) {}
+        });
+        win.start();
+        skipLines(5, scanner);
+        inputPipe.write("7\n8\n9\n".getBytes(StandardCharsets.UTF_8));
+        inputPipe.flush();
+        skipLines(19, scanner);
+        assertEquals("Player1 won", scanner.readLine());
+        win.join(1000);
+    }
+
+    @Test
+    @DisplayName("TS-024: Board display format")
+    void testBoardDisplayFormat() throws IOException {
+        Thread game = new Thread(() -> {
+            try {
+                tic_tac_toe.main(new String[] {"1"});
+            } catch (Exception e) {}
         });
         game.start();
 
-        skipLines(5, scanner);
-
+        assertEquals("Hello!", scanner.readLine());
         assertEquals("|0|0|0|", scanner.readLine());
+        assertEquals("|0|0|0|", scanner.readLine());
+        assertEquals("|0|0|0|", scanner.readLine());
+        assertEquals("Player#1's turn", scanner.readLine());
+
+        inputPipe.write("5\nq\n".getBytes(StandardCharsets.UTF_8));
+        inputPipe.flush();
         assertEquals("|0|0|0|", scanner.readLine());
         assertEquals("|0|1|0|", scanner.readLine());
+        assertEquals("|0|0|0|", scanner.readLine());
+        assertEquals("Player#2's turn", scanner.readLine());
+    }
 
-        game.interrupt();
+    @Test
+    @DisplayName("TS-025: Startup argument contract")
+    void testStartupArgumentContract() throws IOException, InterruptedException {
+
     }
 }
