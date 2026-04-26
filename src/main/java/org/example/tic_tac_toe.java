@@ -30,7 +30,7 @@ public class tic_tac_toe {
 //
 //                System.out.println("Please, input a valid option [1-2]");
 //            } catch (NumberFormatException e) {
-//              System.out.println("not int Please, input a valid option [1-2]");
+//              System.out.println("Please, input a valid option [1-2]");
 //            }
 //        }
 

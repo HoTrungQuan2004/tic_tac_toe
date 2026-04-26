@@ -746,6 +746,90 @@ class gameTest {
     @Test
     @DisplayName("TS-025: Startup argument contract")
     void testStartupArgumentContract() throws IOException, InterruptedException {
+        Thread valid =  new Thread(() -> {
+            try {
+                tic_tac_toe.main(new String[] {"1"});
+            } catch (Exception e) {}
+        });
+        valid.start();
+        assertEquals("Hello!", scanner.readLine());
+        assertEquals("|0|0|0|", scanner.readLine());
+        assertEquals("|0|0|0|", scanner.readLine());
+        assertEquals("|0|0|0|", scanner.readLine());
+        assertEquals("Player#1's turn", scanner.readLine());
+        inputPipe.write("q\n".getBytes(StandardCharsets.UTF_8));
+        inputPipe.flush();
+        valid.join(1000);
+        tearDown();
 
+        setUp();
+        Thread Empty = new Thread(() -> {
+            try {
+                tic_tac_toe.main(new String[] {"\nq\n"});
+            } catch (Exception e) {}
+        });
+        Empty.start();
+        assertEquals("Please, input a valid option [1-2]", scanner.readLine());
+        Empty.join(1000);
+        tearDown();
+
+        setUp();
+        Thread Unvalid = new Thread(() -> {
+            try {
+                tic_tac_toe.main(new String[] {"abc\nq\n"});
+            } catch (Exception e) {}
+        });
+        Unvalid.start();
+        assertEquals("Please, input a valid option [1-2]", scanner.readLine());
+        Unvalid.join(1000);
+    }
+
+    @Test
+    @DisplayName("TS-026: non-integer parsing normalization")
+    void testNonIntegerParsingNormalization() throws IOException, InterruptedException {
+        Thread startSpaceQuit = new Thread(() -> {
+            try {
+                tic_tac_toe.main(new String[] {"1"});
+            } catch (Exception e) {}
+        });
+        startSpaceQuit.start();
+        skipLines(5, scanner);
+        inputPipe.write(" q\nq\n".getBytes(StandardCharsets.UTF_8));
+        inputPipe.flush();
+        assertEquals("Please, input a valid number [1-9]", scanner.readLine());
+        assertEquals("Player#1's turn", scanner.readLine());
+        startSpaceQuit.join(1000);
+        tearDown();
+
+        setUp();
+        Thread endSpaceQuit = new Thread(() -> {
+            try {
+                tic_tac_toe.main(new String[] {"1"});
+            } catch (Exception e) {}
+        });
+        endSpaceQuit.start();
+        skipLines(5, scanner);
+        inputPipe.write("q \nq\n".getBytes(StandardCharsets.UTF_8));
+        inputPipe.flush();
+        assertEquals("Please, input a valid number [1-9]", scanner.readLine());
+        assertEquals("Player#1's turn", scanner.readLine());
+        startSpaceQuit.join(1000);
+        tearDown();
+
+        setUp();
+        Thread inputWithSpaces = new Thread(() -> {
+            try {
+                tic_tac_toe.main(new String[] {"1"});
+            } catch (Exception e) {}
+        });
+        inputWithSpaces.start();
+        skipLines(5, scanner);
+        inputPipe.write(" 5 \nq\n".getBytes(StandardCharsets.UTF_8));
+        inputPipe.flush();
+        assertEquals("|0|0|0|", scanner.readLine());
+        assertEquals("|0|1|0|", scanner.readLine());
+        assertEquals("|0|0|0|", scanner.readLine());
+        assertEquals("Player#2's turn", scanner.readLine());
+        inputWithSpaces.join(1000);
     }
 }
