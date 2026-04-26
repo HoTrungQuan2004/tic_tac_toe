@@ -16,8 +16,8 @@ import java.util.logging.Logger;
 
 class BoardTest {
     private Board board;
-    private final PrintStream OriginalOut = System.out;
     private PipedOutputStream outputStream;
+    private PrintStream printer;
     private BufferedReader scanner;
 
     @BeforeEach
@@ -25,15 +25,20 @@ class BoardTest {
         outputStream = new PipedOutputStream();
         try{
             PipedInputStream inputStream = new PipedInputStream(outputStream);
+            printer = new PrintStream(outputStream, true,  StandardCharsets.UTF_8);
             scanner = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
         } catch (IOException e) {
             Logger.getLogger(Player.class.getName()).log(Level.SEVERE, null, e);
         }
-        board = new Board();
+        board = new Board(printer);
     }
 
     @AfterEach
-    void tearDown() {System.setOut(OriginalOut);}
+    void tearDown() throws IOException {
+        if (printer != null) printer.close();
+        if (outputStream != null) outputStream.close();
+        if (scanner != null) scanner.close();
+    }
 
     @Test
     @DisplayName("Test win on row")
@@ -85,7 +90,7 @@ class BoardTest {
     @DisplayName("Test Player2 choose first empty cell")
     void AIPlayerTest() {
         // Intent: Verify that player 2 can choose correct the first empty cell
-        AIPlayer ai = new AIPlayer(2);
+        AIPlayer ai = new AIPlayer(2, printer);
 
         board.placeMove(1, 1);
 
