@@ -14,7 +14,7 @@ class HumanPlayer extends Player {
     @Override
     public int takeTurn(Board board) {
         while (true) {
-            printer.println("Player#" + id + "'s turn");
+            printer.println("Player#" + id + "'s turn:");
 
             boolean hasNext = scanner.hasNextLine();
             String choiceStr = hasNext ? scanner.nextLine() : null;
