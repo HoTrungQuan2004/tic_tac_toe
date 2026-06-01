@@ -3,7 +3,7 @@ package org.example;
 import java.io.PrintStream;
 import java.util.Scanner;
 
-abstract class Player {
+public abstract class Player {
     protected final int id;
     protected final int value;
     protected final PrintStream printer;

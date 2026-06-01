@@ -2,7 +2,7 @@ package org.example;
 
 import java.io.PrintStream;
 
-class AIPlayer extends Player {
+public class AIPlayer extends Player {
 
     public AIPlayer(int id, PrintStream printer) {
         super(id, printer);

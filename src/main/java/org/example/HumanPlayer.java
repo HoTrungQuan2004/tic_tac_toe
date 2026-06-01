@@ -3,7 +3,7 @@ package org.example;
 import java.io.PrintStream;
 import java.util.Scanner;
 
-class HumanPlayer extends Player {
+public class HumanPlayer extends Player {
     private final Scanner scanner;
 
     public HumanPlayer(int id, Scanner scanner, PrintStream printer) {
