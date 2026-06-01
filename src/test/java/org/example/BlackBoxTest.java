@@ -7,8 +7,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -51,7 +49,7 @@ class gameTest {
     void testHumanStartupMessageAndOrder() throws IOException {
         Thread game = new Thread(() -> {
             try {
-                tic_tac_toe.main(new String[] {"1"});
+                tictactoe.main(new String[] {"1"});
             } catch (Exception e) {}
         });
         game.start();
@@ -71,7 +69,7 @@ class gameTest {
     void testComputerStartupMessageAndOrder() throws IOException {
         Thread game = new Thread(() -> {
             try {
-                tic_tac_toe.main(new String[] {"2"});
+                tictactoe.main(new String[] {"2"});
             } catch (Exception e) {}
         });
         game.start();
@@ -87,7 +85,7 @@ class gameTest {
     @DisplayName("TS-003: Test empty starting argument")
     void testEmptyStart() throws IOException {
         // Intent: Verify that game will ask to re-enter the CLI when the value is empty
-        tic_tac_toe.main(new String[]{});
+        tictactoe.main(new String[]{});
         assertEquals("Please, input a valid option [1-2]", scanner.readLine());
     }
 
@@ -95,13 +93,13 @@ class gameTest {
     @DisplayName("TS-004: Test invalid starting argument")
     void testInvalidStart() throws IOException {
         // Intend: Verify that game will ask to re-enter the CLI when the value is invalid
-        tic_tac_toe.main(new String[]{"3"});
+        tictactoe.main(new String[]{"3"});
         assertEquals("Please, input a valid option [1-2]", scanner.readLine());
-        tic_tac_toe.main(new String[]{"0"});
+        tictactoe.main(new String[]{"0"});
         assertEquals("Please, input a valid option [1-2]", scanner.readLine());
-        tic_tac_toe.main(new String[]{"-1"});
+        tictactoe.main(new String[]{"-1"});
         assertEquals("Please, input a valid option [1-2]", scanner.readLine());
-        tic_tac_toe.main(new String[]{"abc"});
+        tictactoe.main(new String[]{"abc"});
         assertEquals("Please, input a valid option [1-2]", scanner.readLine());
     }
 
@@ -109,11 +107,11 @@ class gameTest {
     @DisplayName("TS-005: Test with extra starting argument")
     void testExtraStart() throws IOException {
         // Intent: Verify that game will ask to re-enter the CLI when the value is more than 1
-        tic_tac_toe.main(new String[]{"01"});
+        tictactoe.main(new String[]{"01"});
         assertEquals("Please, input a valid option [1-2]", scanner.readLine());
-        tic_tac_toe.main(new String[]{"1 2"});
+        tictactoe.main(new String[]{"1 2"});
         assertEquals("Please, input a valid option [1-2]", scanner.readLine());
-        tic_tac_toe.main(new String[]{"\" 1 \""});
+        tictactoe.main(new String[]{"\" 1 \""});
         assertEquals("Please, input a valid option [1-2]", scanner.readLine());
     }
 
@@ -122,7 +120,7 @@ class gameTest {
     void testBoardRendersAs3x3WithStateValues() throws IOException {
         Thread game = new Thread(() -> {
             try {
-                tic_tac_toe.main(new String[] {"1"});
+                tictactoe.main(new String[] {"1"});
             } catch (Exception e) {}
         });
         game.start();
@@ -148,7 +146,7 @@ class gameTest {
     void testAcceptValidHumanMoveAndUpdateBoard() throws IOException {
         Thread game = new Thread(() -> {
             try {
-                tic_tac_toe.main(new String[] {"1"});
+                tictactoe.main(new String[] {"1"});
             } catch (Exception e) {}
         });
         game.start();
@@ -171,7 +169,7 @@ class gameTest {
     void testHandleNonIntegerInput() throws IOException {
         Thread game = new Thread(() -> {
             try {
-                tic_tac_toe.main(new String[] {"1"});
+                tictactoe.main(new String[] {"1"});
             } catch (Exception e) {}
         });
         game.start();
@@ -202,7 +200,7 @@ class gameTest {
     void testQuitGame() throws IOException {
         Thread game = new Thread(() -> {
             try {
-                tic_tac_toe.main(new String[] {"1"});
+                tictactoe.main(new String[] {"1"});
             } catch (Exception e) {}
         });
         game.start();
@@ -219,7 +217,7 @@ class gameTest {
     void testVerifyQCase() throws IOException {
         Thread game = new Thread(() -> {
             try {
-                tic_tac_toe.main(new String[] {"1"});
+                tictactoe.main(new String[] {"1"});
             } catch (Exception e) {}
         });
         game.start();
@@ -250,7 +248,7 @@ class gameTest {
     void testRejectIntegerOutside1() throws IOException {
         Thread game = new Thread(() -> {
             try {
-                tic_tac_toe.main(new String[] {"1"});
+                tictactoe.main(new String[] {"1"});
             } catch (Exception e) {}
         });
         game.start();
@@ -281,7 +279,7 @@ class gameTest {
     void testRejectMoveToOccupiedCell() throws IOException {
         Thread game = new Thread(() -> {
             try {
-                tic_tac_toe.main(new String[] {"1"});
+                tictactoe.main(new String[] {"1"});
             } catch (Exception e) {}
         });
         game.start();
@@ -307,7 +305,7 @@ class gameTest {
     void testHumanWinCondition() throws IOException {
         Thread game = new Thread(() -> {
             try {
-                tic_tac_toe.main(new String[] {"1"});
+                tictactoe.main(new String[] {"1"});
             } catch (Exception e) {}
         });
         game.start();
@@ -328,7 +326,7 @@ class gameTest {
     void testComputerWinDetection() throws IOException {
         Thread game = new Thread(() -> {
             try {
-                tic_tac_toe.main(new String[] {"1"});
+                tictactoe.main(new String[] {"1"});
             } catch (Exception e) {}
         });
         game.start();
@@ -348,7 +346,7 @@ class gameTest {
     void testDrawConditionAfterHumanMove() throws IOException {
         Thread game = new Thread(() -> {
             try {
-                tic_tac_toe.main(new String[] {"1"});
+                tictactoe.main(new String[] {"1"});
             } catch (Exception e) {}
         });
         game.start();
@@ -369,7 +367,7 @@ class gameTest {
     void testDrawConditionAfterComputerMove() throws IOException {
         Thread game = new Thread(() -> {
             try {
-                tic_tac_toe.main(new String[] {"2"});
+                tictactoe.main(new String[] {"2"});
             } catch (Exception e) {}
         });
         game.start();
@@ -390,7 +388,7 @@ class gameTest {
     void testComputerChoosesFirstAvailableCell() throws IOException {
         Thread game = new Thread(() -> {
             try {
-                tic_tac_toe.main(new String[] {"2"});
+                tictactoe.main(new String[] {"2"});
             } catch (Exception e) {}
         });
         game.start();
@@ -419,7 +417,7 @@ class gameTest {
     void testBoardIntegrityAfterEveryMove() throws IOException {
         Thread game = new Thread(() -> {
             try {
-                tic_tac_toe.main(new String[] {"1"});
+                tictactoe.main(new String[] {"1"});
             } catch (Exception e) {}
         });
         game.start();
@@ -480,7 +478,7 @@ class gameTest {
     void testTurnPromptSequenceCorrectness() throws IOException {
         Thread game = new Thread(() -> {
             try {
-                tic_tac_toe.main(new String[] {"1"});
+                tictactoe.main(new String[] {"1"});
             } catch (Exception e) {}
         });
         game.start();
@@ -523,7 +521,7 @@ class gameTest {
     void testStopProgram() throws IOException, InterruptedException {
         Thread gameHumanWin = new Thread(() -> {
             try {
-                tic_tac_toe.main(new String[] {"1"});
+                tictactoe.main(new String[] {"1"});
             } catch (Exception e) {}
         });
         gameHumanWin.start();
@@ -541,7 +539,7 @@ class gameTest {
         setUp();
         Thread gameComWin = new Thread(() -> {
             try {
-                tic_tac_toe.main(new String[] {"1"});
+                tictactoe.main(new String[] {"1"});
             } catch (Exception e) {}
         });
         gameComWin.start();
@@ -559,7 +557,7 @@ class gameTest {
         setUp();
         Thread gameDraw = new Thread(() -> {
             try {
-                tic_tac_toe.main(new String[] {"1"});
+                tictactoe.main(new String[] {"1"});
             } catch (Exception e) {}
         });
         gameDraw.start();
@@ -577,7 +575,7 @@ class gameTest {
         setUp();
         Thread gameQuit = new Thread(() -> {
             try {
-                tic_tac_toe.main(new String[] {"1"});
+                tictactoe.main(new String[] {"1"});
             } catch (Exception e) {}
         });
         gameQuit.start();
@@ -595,7 +593,7 @@ class gameTest {
 
         Thread game = new Thread(() -> {
             try {
-                tic_tac_toe.main(new String[] {"1"});
+                tictactoe.main(new String[] {"1"});
             } catch (Throwable e) {
                 if (!e.getClass().getSimpleName().contains("GameQuitException")) {
                     errorInThread[0] = e;
@@ -633,7 +631,7 @@ class gameTest {
     void testOutputConsistency() throws IOException, InterruptedException {
         Thread invalidArg = new Thread(() -> {
             try {
-                tic_tac_toe.main(new String[] {"abc\nq\n"});
+                tictactoe.main(new String[] {"abc\nq\n"});
             } catch (Exception e) {}
         });
         invalidArg.start();
@@ -644,7 +642,7 @@ class gameTest {
         setUp();
         Thread invalidMove = new Thread(() -> {
             try {
-                tic_tac_toe.main(new String[] {"1"});
+                tictactoe.main(new String[] {"1"});
             } catch (Exception e) {}
         });
         invalidMove.start();
@@ -659,7 +657,7 @@ class gameTest {
         setUp();
         Thread occupiedCell = new Thread(() -> {
             try {
-                tic_tac_toe.main(new String[] {"1"});
+                tictactoe.main(new String[] {"1"});
             } catch (Exception e) {}
         });
         occupiedCell.start();
@@ -675,7 +673,7 @@ class gameTest {
         setUp();
         Thread quit = new Thread(() -> {
             try {
-                tic_tac_toe.main(new String[] {"1"});
+                tictactoe.main(new String[] {"1"});
             } catch (Exception e) {}
         });
         quit.start();
@@ -689,7 +687,7 @@ class gameTest {
         setUp();
         Thread Draw = new Thread(() -> {
             try {
-                tic_tac_toe.main(new String[] {"1"});
+                tictactoe.main(new String[] {"1"});
             } catch (Exception e) {}
         });
         Draw.start();
@@ -707,7 +705,7 @@ class gameTest {
         setUp();
         Thread win = new Thread(() -> {
             try {
-                tic_tac_toe.main(new String[] {"1"});
+                tictactoe.main(new String[] {"1"});
             } catch (Exception e) {}
         });
         win.start();
@@ -724,7 +722,7 @@ class gameTest {
     void testBoardDisplayFormat() throws IOException {
         Thread game = new Thread(() -> {
             try {
-                tic_tac_toe.main(new String[] {"1"});
+                tictactoe.main(new String[] {"1"});
             } catch (Exception e) {}
         });
         game.start();
@@ -748,7 +746,7 @@ class gameTest {
     void testStartupArgumentContract() throws IOException, InterruptedException {
         Thread valid =  new Thread(() -> {
             try {
-                tic_tac_toe.main(new String[] {"1"});
+                tictactoe.main(new String[] {"1"});
             } catch (Exception e) {}
         });
         valid.start();
@@ -765,7 +763,7 @@ class gameTest {
         setUp();
         Thread Empty = new Thread(() -> {
             try {
-                tic_tac_toe.main(new String[] {"\nq\n"});
+                tictactoe.main(new String[] {"\nq\n"});
             } catch (Exception e) {}
         });
         Empty.start();
@@ -776,7 +774,7 @@ class gameTest {
         setUp();
         Thread Unvalid = new Thread(() -> {
             try {
-                tic_tac_toe.main(new String[] {"abc\nq\n"});
+                tictactoe.main(new String[] {"abc\nq\n"});
             } catch (Exception e) {}
         });
         Unvalid.start();
@@ -789,7 +787,7 @@ class gameTest {
     void testNonIntegerParsingNormalization() throws IOException, InterruptedException {
         Thread startSpaceQuit = new Thread(() -> {
             try {
-                tic_tac_toe.main(new String[] {"1"});
+                tictactoe.main(new String[] {"1"});
             } catch (Exception e) {}
         });
         startSpaceQuit.start();
@@ -804,7 +802,7 @@ class gameTest {
         setUp();
         Thread endSpaceQuit = new Thread(() -> {
             try {
-                tic_tac_toe.main(new String[] {"1"});
+                tictactoe.main(new String[] {"1"});
             } catch (Exception e) {}
         });
         endSpaceQuit.start();
@@ -819,7 +817,7 @@ class gameTest {
         setUp();
         Thread inputWithSpaces = new Thread(() -> {
             try {
-                tic_tac_toe.main(new String[] {"1"});
+                tictactoe.main(new String[] {"1"});
             } catch (Exception e) {}
         });
         inputWithSpaces.start();

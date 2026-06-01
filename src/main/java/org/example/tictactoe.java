@@ -1,11 +1,10 @@
 package org.example;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Scanner;
 
-public class tic_tac_toe {
+public class tictactoe {
     public static void main(String[] args) throws IOException {
         PrintStream printer = System.out;
         Scanner keyboard = new Scanner(System.in);

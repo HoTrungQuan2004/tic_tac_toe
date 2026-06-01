@@ -34,7 +34,7 @@
 <!--                </descriptorRefs>-->
 <!--                <archive>-->
 <!--                    <manifest>-->
-<!--                        <mainClass>org.example.tic_tac_toe</mainClass>-->
+<!--                        <mainClass>org.example.tictactoe</mainClass>-->
 <!--                    </manifest>-->
 <!--                </archive>-->
 <!--            </configuration>-->
@@ -63,7 +63,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>org.example.tic_tac_toe</mainClass>
+                            <mainClass>org.example.tictactoe</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
