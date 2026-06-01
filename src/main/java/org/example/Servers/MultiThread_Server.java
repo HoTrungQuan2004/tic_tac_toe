@@ -1,12 +1,15 @@
-package org.example;
+package org.example.Servers;
+
+import org.example.AIPlayer;
+import org.example.Game;
+import org.example.HumanPlayer;
+import org.example.Player;
 
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Scanner;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class MultiThread_Server {
     public static void main(String[] args) {

@@ -1,4 +1,9 @@
-package org.example;
+package org.example.Servers;
+
+import org.example.AIPlayer;
+import org.example.Game;
+import org.example.HumanPlayer;
+import org.example.Player;
 
 import java.io.IOException;
 import java.io.PrintStream;
