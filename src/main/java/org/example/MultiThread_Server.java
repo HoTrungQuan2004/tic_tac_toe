@@ -11,9 +11,9 @@ import java.util.concurrent.Executors;
 public class MultiThread_Server {
     public static void main(String[] args) {
         int port = 8080;
-        int maxThreads = 80;
+//        int maxThreads = 80;
 
-        ExecutorService threadPool = Executors.newFixedThreadPool(maxThreads);
+//        ExecutorService threadPool = Executors.newFixedThreadPool(maxThreads);
 
         try (ServerSocket ss = new ServerSocket(port);) {
             System.out.println("Waiting for connection from port " + port);
@@ -21,7 +21,8 @@ public class MultiThread_Server {
                 Socket con = ss.accept();
                 System.out.println("Accepted connection from " + con.getRemoteSocketAddress());
 
-                threadPool.execute(() -> {
+//                threadPool.execute(() -> {
+                Thread gameThread = new Thread(() -> {
                    try (Scanner input = new Scanner(con.getInputStream());
                         PrintStream output = new PrintStream(con.getOutputStream(), true)) {
 
@@ -42,12 +43,14 @@ public class MultiThread_Server {
                        }
                    }
                 });
+                gameThread.start();
             }
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            threadPool.shutdown();
         }
+//        finally {
+//            threadPool.shutdown();
+//        }
     }
 }
 
