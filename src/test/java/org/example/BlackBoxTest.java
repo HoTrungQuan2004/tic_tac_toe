@@ -60,7 +60,7 @@ class gameTest {
         assertEquals("|0|0|0|", scanner.readLine());
         assertEquals("|0|0|0|", scanner.readLine());
         assertEquals("|0|0|0|", scanner.readLine());
-        assertEquals("Player#1's turn", scanner.readLine());
+        assertEquals("Player#1's turn:", scanner.readLine());
 
         inputPipe.write("q\n".getBytes(StandardCharsets.UTF_8));
         inputPipe.flush();
@@ -80,7 +80,7 @@ class gameTest {
         assertEquals("|0|0|0|", scanner.readLine());
         assertEquals("|0|0|0|", scanner.readLine());
         assertEquals("|0|0|0|", scanner.readLine());
-        assertEquals("Player#2's turn", scanner.readLine());
+        assertEquals("Player#2's turn...", scanner.readLine());
     }
 
     @Test
@@ -181,17 +181,17 @@ class gameTest {
         inputPipe.write("abc\n".getBytes(StandardCharsets.UTF_8));
         inputPipe.flush();
         assertEquals("Please, input a valid number [1-9]", scanner.readLine());
-        assertEquals("Player#1's turn", scanner.readLine());
+        assertEquals("Player#1's turn:", scanner.readLine());
 
         inputPipe.write("@\n".getBytes(StandardCharsets.UTF_8));
         inputPipe.flush();
         assertEquals("Please, input a valid number [1-9]", scanner.readLine());
-        assertEquals("Player#1's turn", scanner.readLine());
+        assertEquals("Player#1's turn:", scanner.readLine());
 
         inputPipe.write("\n".getBytes(StandardCharsets.UTF_8));
         inputPipe.flush();
         assertEquals("Please, input a valid number [1-9]", scanner.readLine());
-        assertEquals("Player#1's turn", scanner.readLine());
+        assertEquals("Player#1's turn:", scanner.readLine());
 
         inputPipe.write("q\n".getBytes(StandardCharsets.UTF_8));
         inputPipe.flush();
@@ -229,17 +229,17 @@ class gameTest {
         inputPipe.write("Q\n".getBytes(StandardCharsets.UTF_8));
         inputPipe.flush();
         assertEquals("Please, input a valid number [1-9]", scanner.readLine());
-        assertEquals("Player#1's turn", scanner.readLine());
+        assertEquals("Player#1's turn:", scanner.readLine());
 
         inputPipe.write(" q\n".getBytes(StandardCharsets.UTF_8));
         inputPipe.flush();
         assertEquals("Please, input a valid number [1-9]", scanner.readLine());
-        assertEquals("Player#1's turn", scanner.readLine());
+        assertEquals("Player#1's turn:", scanner.readLine());
 
         inputPipe.write("q \n".getBytes(StandardCharsets.UTF_8));
         inputPipe.flush();
         assertEquals("Please, input a valid number [1-9]", scanner.readLine());
-        assertEquals("Player#1's turn", scanner.readLine());
+        assertEquals("Player#1's turn:", scanner.readLine());
 
         inputPipe.write("q\n".getBytes(StandardCharsets.UTF_8));
         inputPipe.flush();
@@ -260,17 +260,17 @@ class gameTest {
         inputPipe.write("0\n".getBytes(StandardCharsets.UTF_8));
         inputPipe.flush();
         assertEquals("Please, input a valid number [1-9]", scanner.readLine());
-        assertEquals("Player#1's turn", scanner.readLine());
+        assertEquals("Player#1's turn:", scanner.readLine());
 
         inputPipe.write("10\n".getBytes(StandardCharsets.UTF_8));
         inputPipe.flush();
         assertEquals("Please, input a valid number [1-9]", scanner.readLine());
-        assertEquals("Player#1's turn", scanner.readLine());
+        assertEquals("Player#1's turn:", scanner.readLine());
 
         inputPipe.write("-3\n".getBytes(StandardCharsets.UTF_8));
         inputPipe.flush();
         assertEquals("Please, input a valid number [1-9]", scanner.readLine());
-        assertEquals("Player#1's turn", scanner.readLine());
+        assertEquals("Player#1's turn:", scanner.readLine());
 
         inputPipe.write("q\n".getBytes(StandardCharsets.UTF_8));
         inputPipe.flush();
@@ -296,7 +296,7 @@ class gameTest {
         inputPipe.flush();
         skipLines(4, scanner);
         assertEquals("This cell is occupied, please choose another cell!", scanner.readLine());
-        assertEquals("Player#1's turn", scanner.readLine());
+        assertEquals("Player#1's turn:", scanner.readLine());
 
         inputPipe.write("q\n".getBytes(StandardCharsets.UTF_8));
         inputPipe.flush();
@@ -400,7 +400,7 @@ class gameTest {
         assertEquals("|2|0|0|", scanner.readLine());
         assertEquals("|0|0|0|", scanner.readLine());
         assertEquals("|0|0|0|", scanner.readLine());
-        assertEquals("Player#1's turn", scanner.readLine());
+        assertEquals("Player#1's turn:", scanner.readLine());
 
         inputPipe.write("2\n".getBytes(StandardCharsets.UTF_8));
         inputPipe.flush();
@@ -408,7 +408,7 @@ class gameTest {
         assertEquals("|2|1|2|", scanner.readLine());
         assertEquals("|0|0|0|", scanner.readLine());
         assertEquals("|0|0|0|", scanner.readLine());
-        assertEquals("Player#1's turn", scanner.readLine());
+        assertEquals("Player#1's turn:", scanner.readLine());
 
         inputPipe.write("q\n".getBytes(StandardCharsets.UTF_8));
         inputPipe.flush();
@@ -432,42 +432,42 @@ class gameTest {
         assertEquals("|0|1|0|", scanner.readLine());
         assertEquals("|0|0|0|", scanner.readLine());
         assertEquals("|0|0|0|", scanner.readLine());
-        assertEquals("Player#2's turn", scanner.readLine());
+        assertEquals("Player#2's turn...", scanner.readLine());
 
         assertEquals("|2|1|0|", scanner.readLine());
         assertEquals("|0|0|0|", scanner.readLine());
         assertEquals("|0|0|0|", scanner.readLine());
-        assertEquals("Player#1's turn", scanner.readLine());
+        assertEquals("Player#1's turn:", scanner.readLine());
 
         assertEquals("|2|1|0|", scanner.readLine());
         assertEquals("|1|0|0|", scanner.readLine());
         assertEquals("|0|0|0|", scanner.readLine());
-        assertEquals("Player#2's turn", scanner.readLine());
+        assertEquals("Player#2's turn...", scanner.readLine());
 
         assertEquals("|2|1|2|", scanner.readLine());
         assertEquals("|1|0|0|", scanner.readLine());
         assertEquals("|0|0|0|", scanner.readLine());
-        assertEquals("Player#1's turn", scanner.readLine());
+        assertEquals("Player#1's turn:", scanner.readLine());
 
         assertEquals("|2|1|2|", scanner.readLine());
         assertEquals("|1|1|0|", scanner.readLine());
         assertEquals("|0|0|0|", scanner.readLine());
-        assertEquals("Player#2's turn", scanner.readLine());
+        assertEquals("Player#2's turn...", scanner.readLine());
 
         assertEquals("|2|1|2|", scanner.readLine());
         assertEquals("|1|1|2|", scanner.readLine());
         assertEquals("|0|0|0|", scanner.readLine());
-        assertEquals("Player#1's turn", scanner.readLine());
+        assertEquals("Player#1's turn:", scanner.readLine());
 
         assertEquals("|2|1|2|", scanner.readLine());
         assertEquals("|1|1|2|", scanner.readLine());
         assertEquals("|1|0|0|", scanner.readLine());
-        assertEquals("Player#2's turn", scanner.readLine());
+        assertEquals("Player#2's turn...", scanner.readLine());
 
         assertEquals("|2|1|2|", scanner.readLine());
         assertEquals("|1|1|2|", scanner.readLine());
         assertEquals("|1|2|0|", scanner.readLine());
-        assertEquals("Player#1's turn", scanner.readLine());
+        assertEquals("Player#1's turn:", scanner.readLine());
 
         assertEquals("|2|1|2|", scanner.readLine());
         assertEquals("|1|1|2|", scanner.readLine());
@@ -492,27 +492,27 @@ class gameTest {
         assertEquals("|1|0|0|", scanner.readLine());
         assertEquals("|0|0|0|", scanner.readLine());
         assertEquals("|0|0|0|", scanner.readLine());
-        assertEquals("Player#2's turn", scanner.readLine());
+        assertEquals("Player#2's turn...", scanner.readLine());
 
         skipLines(4, scanner);
 
         assertEquals("Please, input a valid number [1-9]", scanner.readLine());
-        assertEquals("Player#1's turn", scanner.readLine());
+        assertEquals("Player#1's turn:", scanner.readLine());
 
         assertEquals("|1|2|1|", scanner.readLine());
         assertEquals("|0|0|0|", scanner.readLine());
         assertEquals("|0|0|0|", scanner.readLine());
-        assertEquals("Player#2's turn", scanner.readLine());
+        assertEquals("Player#2's turn...", scanner.readLine());
 
         skipLines(4, scanner);
 
         assertEquals("This cell is occupied, please choose another cell!", scanner.readLine());
-        assertEquals("Player#1's turn", scanner.readLine());
+        assertEquals("Player#1's turn:", scanner.readLine());
 
         assertEquals("|1|2|1|", scanner.readLine());
         assertEquals("|2|0|0|", scanner.readLine());
         assertEquals("|0|0|1|", scanner.readLine());
-        assertEquals("Player#2's turn", scanner.readLine());
+        assertEquals("Player#2's turn...", scanner.readLine());
 
         inputPipe.write("q\n".getBytes(StandardCharsets.UTF_8));
         inputPipe.flush();
@@ -652,7 +652,7 @@ class gameTest {
         inputPipe.write("abc\nq\n".getBytes(StandardCharsets.UTF_8));
         inputPipe.flush();
         assertEquals("Please, input a valid number [1-9]", scanner.readLine());
-        assertEquals("Player#1's turn",  scanner.readLine());
+        assertEquals("Player#1's turn:",  scanner.readLine());
         invalidMove.join(1000);
         tearDown();
 
@@ -668,7 +668,7 @@ class gameTest {
         inputPipe.flush();
         skipLines(8, scanner);
         assertEquals("This cell is occupied, please choose another cell!", scanner.readLine());
-        assertEquals("Player#1's turn", scanner.readLine());
+        assertEquals("Player#1's turn:", scanner.readLine());
         occupiedCell.join(1000);
         tearDown();
 
@@ -733,14 +733,14 @@ class gameTest {
         assertEquals("|0|0|0|", scanner.readLine());
         assertEquals("|0|0|0|", scanner.readLine());
         assertEquals("|0|0|0|", scanner.readLine());
-        assertEquals("Player#1's turn", scanner.readLine());
+        assertEquals("Player#1's turn:", scanner.readLine());
 
         inputPipe.write("5\nq\n".getBytes(StandardCharsets.UTF_8));
         inputPipe.flush();
         assertEquals("|0|0|0|", scanner.readLine());
         assertEquals("|0|1|0|", scanner.readLine());
         assertEquals("|0|0|0|", scanner.readLine());
-        assertEquals("Player#2's turn", scanner.readLine());
+        assertEquals("Player#2's turn...", scanner.readLine());
     }
 
     @Test
@@ -756,7 +756,7 @@ class gameTest {
         assertEquals("|0|0|0|", scanner.readLine());
         assertEquals("|0|0|0|", scanner.readLine());
         assertEquals("|0|0|0|", scanner.readLine());
-        assertEquals("Player#1's turn", scanner.readLine());
+        assertEquals("Player#1's turn:", scanner.readLine());
         inputPipe.write("q\n".getBytes(StandardCharsets.UTF_8));
         inputPipe.flush();
         valid.join(1000);
@@ -797,7 +797,7 @@ class gameTest {
         inputPipe.write(" q\nq\n".getBytes(StandardCharsets.UTF_8));
         inputPipe.flush();
         assertEquals("Please, input a valid number [1-9]", scanner.readLine());
-        assertEquals("Player#1's turn", scanner.readLine());
+        assertEquals("Player#1's turn:", scanner.readLine());
         startSpaceQuit.join(1000);
         tearDown();
 
@@ -812,7 +812,7 @@ class gameTest {
         inputPipe.write("q \nq\n".getBytes(StandardCharsets.UTF_8));
         inputPipe.flush();
         assertEquals("Please, input a valid number [1-9]", scanner.readLine());
-        assertEquals("Player#1's turn", scanner.readLine());
+        assertEquals("Player#1's turn:", scanner.readLine());
         startSpaceQuit.join(1000);
         tearDown();
 
@@ -829,7 +829,7 @@ class gameTest {
         assertEquals("|0|0|0|", scanner.readLine());
         assertEquals("|0|1|0|", scanner.readLine());
         assertEquals("|0|0|0|", scanner.readLine());
-        assertEquals("Player#2's turn", scanner.readLine());
+        assertEquals("Player#2's turn...", scanner.readLine());
         inputWithSpaces.join(1000);
     }
 }
