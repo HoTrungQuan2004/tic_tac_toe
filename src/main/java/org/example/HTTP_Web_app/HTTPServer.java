@@ -1,4 +1,4 @@
-package org.example.HTTP;
+package org.example.HTTP_Web_app;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;

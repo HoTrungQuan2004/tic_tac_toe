@@ -1,4 +1,4 @@
-package org.example.HTTP;
+package org.example.HTTP_Web_app;
 
 import org.example.AIPlayer;
 import org.example.Board;

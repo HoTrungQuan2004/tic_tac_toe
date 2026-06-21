@@ -1,4 +1,4 @@
-package org.example.HTTP;
+package org.example.HTTP_Web_app;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
