@@ -38,7 +38,7 @@ public class NaiveClient {
                 // parse server response status and updated board
                 String status = parseJsonField(responseBody, "status");
 
-                if ("INVALID_MOVE".equals(status)) {
+                if ("INVALID_MOVE".equals(status) || "CELL_OCCUPIED".equals(status)) {
                     String error = parseJsonField(responseBody, "errorMessage");
                     System.out.println("Error: " + error);
                     continue;

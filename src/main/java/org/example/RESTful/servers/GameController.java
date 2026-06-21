@@ -33,10 +33,18 @@ public class GameController implements HttpHandler {
 
         String responseJson;
 
-        // check valid and place move
-        if (humanPos < 1 || humanPos > 9 || !board.placeMove(humanPos, 1)) {
+        // check valid
+        if (humanPos < 1 || humanPos > 9) {
             responseJson = "{\"board\":" + requestBody.split("\"board\":")[1].split(",\"position\"")[0] +
-                    ",\"status\":\"INVALID_MOVE\",\"errorMessage\":\"Cell occupied or invalid position!\"}";
+                    ",\"status\":\"INVALID_MOVE\",\"errorMessage\":\"Please, input a valid number [1-9]\"}";
+            sendResponse(exchange, 400, responseJson);
+            return;
+        }
+
+        // check occupied
+        if (!board.placeMove(humanPos, 1)) {
+            responseJson = "{\"board\":" + requestBody.split("\"board\":")[1].split(",\"position\"")[0] +
+                    ",\"status\":\"CELL_OCCUPIED\",\"errorMessage\":\"This cell is occupied, please choose another cell!\"}";
             sendResponse(exchange, 400, responseJson);
             return;
         }
