@@ -9,7 +9,6 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,7 +30,7 @@ public class HTTPServer {
     public void start() throws IOException {
         HttpServer server = HttpServer.create(new InetSocketAddress(PORT), 0);
 
-        server.createContext("/tic_tac_toe", this::dispatch);
+        server.createContext("/", this::dispatch);
 
         server.setExecutor(Executors.newFixedThreadPool(80));
         server.start();
@@ -48,6 +47,14 @@ public class HTTPServer {
         String path = exchange.getRequestURI().getPath();
 
         try {
+            if ("OPTIONS".equalsIgnoreCase(method)) {
+                exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
+                exchange.getResponseHeaders().set("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
+                exchange.getResponseHeaders().set("Access-Control-Allow-Headers", "Content-Type");
+                exchange.sendResponseHeaders(204, -1);
+                return;
+            }
+
             if ("POST".equalsIgnoreCase(method) && "/game".equals(path)) {
                 handleCreateGame(exchange);
             } else if ("GET".equalsIgnoreCase(method) && SESSION_PATH.matcher(path).matches()) {
@@ -83,6 +90,10 @@ public class HTTPServer {
         }
 
         GameSession session = manager.createGameSession(humanFirst);
+
+        String msg = "Hello!";
+
+        sendJson(exchange, 201, buildStateJson(session, msg));
     }
 
     private void handleGetGame(HttpExchange exchange, String id) throws IOException {
@@ -161,7 +172,13 @@ public class HTTPServer {
     // =======================
     private void sendJson(HttpExchange exchange, int statusCode, String json) throws IOException {
         byte[] bytes = json.getBytes(StandardCharsets.UTF_8);
-        exchange.getRequestHeaders().set("Content-Type", "application/json; charset=utf-8");
+        exchange.getResponseHeaders().set("Content-Type", "application/json; charset=utf-8");
+
+        // CORS Header
+        exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
+        exchange.getResponseHeaders().set("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
+        exchange.getResponseHeaders().set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
         exchange.sendResponseHeaders(statusCode, bytes.length);
 
         try (OutputStream os = exchange.getResponseBody()) {
