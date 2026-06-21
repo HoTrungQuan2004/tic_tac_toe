@@ -29,8 +29,8 @@ public class Board {
         this.printer = printer;
 
         int pos = 1;
-        for (int i = 0; i <= 3; i++) {
-            for (int j = 0; j <= 3; j++) {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
                 int cellValue = currentBoard[i][j];
                 if (cellValue != 0) {
                     this.cells[i][j] = cellValue;
@@ -40,6 +40,10 @@ public class Board {
                 pos++;
             }
         }
+    }
+
+    public int[][] getCells() {
+        return cells;
     }
 
     public boolean placeMove(int position, int playerValue) {
