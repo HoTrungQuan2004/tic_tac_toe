@@ -44,20 +44,14 @@
 <footer>Connects to HTTP server on <code>localhost:8080</code></footer>
 
 <script>
-    /* =============================================================
-       Configuration
-    ============================================================= */
+<!--       Configuration-->
     const BASE_URL = 'http://localhost:8080';
 
-    /* =============================================================
-       State
-    ============================================================= */
+<!--       State-->
     let gameId     = null;
     let gameOver   = false;
 
-    /* =============================================================
-       DOM refs
-    ============================================================= */
+<!--       DOM refs-->
     const setupPanel  = document.getElementById('setup-panel');
     const gameUi      = document.getElementById('game-ui');
     const statusBar   = document.getElementById('status-bar');
@@ -65,9 +59,8 @@
     const btnStart    = document.getElementById('btn-start');
     const btnEnd      = document.getElementById('btn-end');
 
-    /* =============================================================
-       API helpers
-    ============================================================= */
+
+<!--       API helpers-->
     async function apiPost(path, body = null) {
         const opts = {
             method: 'POST',
@@ -83,9 +76,8 @@
         return { status: res.status, data: await res.json() };
     }
 
-    /* =============================================================
-       Board rendering
-    ============================================================= */
+
+<!--       Board rendering-->
     const SYMBOLS = { 0: '', 1: 'X', 2: 'O' };
 
     function renderBoard(board, allowClick) {
@@ -106,17 +98,15 @@
         });
     }
 
-    /* =============================================================
-       Status bar helpers
-    ============================================================= */
+
+<!--       Status bar helpers-->
     function setStatus(text, cls = '') {
         statusBar.textContent = text;
         statusBar.className = cls;
     }
 
-    /* =============================================================
-       Game-state update
-    ============================================================= */
+
+<!--       Game-state update-->
     function applyState(data) {
         const s = data.status;        // ONGOING | HUMAN_WIN | AI_WIN | DRAW
         const board     = data.board; // int[9]
@@ -140,9 +130,8 @@
         }
     }
 
-    /* =============================================================
-       Actions
-    ============================================================= */
+
+<!--       Actions-->
     async function startGame() {
         const humanFirst = document.querySelector('input[name="first"]:checked').value === 'human';
         setStatus('Creating game...', '');
@@ -191,9 +180,8 @@
         setupPanel.classList.remove('hidden');
     }
 
-    /* =============================================================
-       Event listeners
-    ============================================================= */
+
+<!--       Event listeners-->
     btnStart.addEventListener('click', startGame);
     btnEnd.addEventListener('click', endGame);
 </script>
