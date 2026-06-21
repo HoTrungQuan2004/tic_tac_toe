@@ -19,6 +19,29 @@ public class Board {
         this.printer = printer;
     }
 
+    // Constructor for RESTful
+    public Board(int[][] currentBoard, PrintStream printer) {
+        cells       = new int[][]{{0,0,0},{0,0,0},{0,0,0}};
+        rowCounter  = new int[3];
+        colCounter  = new int[3];
+        diaCounter  = new int[2];
+        totalMoves  = 0;
+        this.printer = printer;
+
+        int pos = 1;
+        for (int i = 0; i <= 3; i++) {
+            for (int j = 0; j <= 3; j++) {
+                int cellValue = currentBoard[i][j];
+                if (cellValue != 0) {
+                    this.cells[i][j] = cellValue;
+                    this.totalMoves++;
+                    updateCounters(i,j,pos,cellValue);
+                }
+                pos++;
+            }
+        }
+    }
+
     public boolean placeMove(int position, int playerValue) {
         int row = toRow(position);
         int col = toCol(position);
