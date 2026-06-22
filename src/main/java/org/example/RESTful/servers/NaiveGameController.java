@@ -11,7 +11,7 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-public class GameController implements HttpHandler {
+public class NaiveGameController implements HttpHandler {
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {

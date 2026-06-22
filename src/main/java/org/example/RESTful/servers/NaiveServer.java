@@ -10,7 +10,7 @@ public class NaiveServer {
 
     public static void main(String[] args) throws IOException {
         HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
-        server.createContext("/api/game/turn", new GameController());
+        server.createContext("/api/game/turn", new NaiveGameController());
 
         server.setExecutor(null);
 
