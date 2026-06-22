@@ -44,7 +44,7 @@ public class GameSession {
     public boolean isHumanTurn() {return humanTurn;}
     public int[] getSnapshot() {return snapshot;}
 
-    public synchronized String humanMove(int pos) {
+    public String humanMove(int pos) {
         if (pos < 1 || pos > 9) {return "Please, input a valid number [1-9]";}
 
         if (!board.placeMove(pos, 1)) {return "This cell is occupied, please choose another cell!";}

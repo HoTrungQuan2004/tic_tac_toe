@@ -32,7 +32,7 @@ public class HTTPServer {
 
         server.createContext("/", this::dispatch);
 
-        server.setExecutor(Executors.newFixedThreadPool(80));
+        server.setExecutor(null);
         server.start();
 
         System.out.println("HTTP Server started. Listening on port " + PORT);
@@ -48,9 +48,8 @@ public class HTTPServer {
 
         try {
             if ("OPTIONS".equalsIgnoreCase(method)) {
-                exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
-                exchange.getResponseHeaders().set("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
-                exchange.getResponseHeaders().set("Access-Control-Allow-Headers", "Content-Type");
+
+                setCorsHeaders(exchange);
                 exchange.sendResponseHeaders(204, -1);
                 return;
             }
@@ -118,7 +117,7 @@ public class HTTPServer {
         try {
             pos = parseIntField(body, "position");
         } catch (NumberFormatException e) {
-            sendJson(exchange, 400, "{\\\"ERROR\\\":\\\"Body must contain \\\\\\\"position\\\\\\\" (1-9)\\\"}");
+            sendJson(exchange, 400, "{\"error\":\"Body must contain \\\"position\\\" (1-9)\"}");
             return;
         }
 
@@ -172,18 +171,20 @@ public class HTTPServer {
     // =======================
     private void sendJson(HttpExchange exchange, int statusCode, String json) throws IOException {
         byte[] bytes = json.getBytes(StandardCharsets.UTF_8);
+        setCorsHeaders(exchange);
         exchange.getResponseHeaders().set("Content-Type", "application/json; charset=utf-8");
-
-        // CORS Header
-        exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
-        exchange.getResponseHeaders().set("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
-        exchange.getResponseHeaders().set("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
         exchange.sendResponseHeaders(statusCode, bytes.length);
 
         try (OutputStream os = exchange.getResponseBody()) {
             os.write(bytes);
         }
+    }
+
+    private void setCorsHeaders(HttpExchange exchange) {
+        exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
+        exchange.getResponseHeaders().set("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
+        exchange.getResponseHeaders().set("Access-Control-Allow-Headers", "Content-Type");
     }
 
     private String readBody(HttpExchange exchange) throws IOException {
