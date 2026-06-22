@@ -2,26 +2,21 @@ package org.example.HTTP_Web_app;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
+import org.example.AIPlayer;
+import org.example.Board;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class HTTPServer {
     private static final int PORT = 8080;
-
-    // /game/<uuid>/move
-    private static final Pattern MOVE_PATH = Pattern.compile("^/game/([^/]+)/move$");
-    // /game/<uuid>
-    private static final Pattern SESSION_PATH = Pattern.compile("^/game/([^/]+)$");
-
-    private final GameSessionManager manager = new GameSessionManager();
 
     public static void main(String[] args) throws IOException {
         new HTTPServer().start();
@@ -36,10 +31,7 @@ public class HTTPServer {
         server.start();
 
         System.out.println("HTTP Server started. Listening on port " + PORT);
-        System.out.println("POST /game          – start a new game");
-        System.out.println("GET  /game/{id}     – get game state");
-        System.out.println("POST /game/{id}/move – make a move");
-        System.out.println("DELETE /game/{id}   – end session");
+        System.out.println("POST /game/move");
     }
 
     private void dispatch(HttpExchange exchange) throws IOException {
@@ -54,17 +46,8 @@ public class HTTPServer {
                 return;
             }
 
-            if ("POST".equalsIgnoreCase(method) && "/game".equals(path)) {
-                handleCreateGame(exchange);
-            } else if ("GET".equalsIgnoreCase(method) && SESSION_PATH.matcher(path).matches()) {
-                String id = extractGroup(SESSION_PATH, path, 1);
-                handleGetGame(exchange, id);
-            } else if ("POST".equalsIgnoreCase(method) && MOVE_PATH.matcher(path).matches()) {
-                String id = extractGroup(MOVE_PATH, path, 1);
-                handleMove(exchange, id);
-            } else if ("DELETE".equalsIgnoreCase(method) && SESSION_PATH.matcher(path).matches()) {
-                String id = extractGroup(SESSION_PATH, path, 1);
-                handleDelete(exchange, id);
+            if ("POST".equalsIgnoreCase(method) && "/game/move".equals(path)) {
+                handleMove(exchange);
             } else {
                 sendJson(exchange, 404, "{\"error\":\"Not found\"}");
             }
@@ -78,92 +61,72 @@ public class HTTPServer {
     // ========================================
     // HANDLERS
     // ========================================
-    private void handleCreateGame(HttpExchange exchange) throws IOException {
+    private void handleMove(HttpExchange exchange) throws IOException {
         String body = readBody(exchange);
 
-        // humanFirst default true if absent in json
-        boolean humanFirst = true;
-        if (body.contains("\"humanFirst\"")) {
-            humanFirst = body.contains("\"humanFirst\":true")
-                        || body.contains("\"humanFirst\": true");
+        int pos = parseIntField(body, "position");
+        int[] currentBoard = parseBoardField(body);
+
+        int[][] board2D = new int[3][3];
+        for (int i = 0; i < 9; i++) {
+            board2D[i / 3][i % 3] = currentBoard[i];
         }
 
-        GameSession session = manager.createGameSession(humanFirst);
+        PrintStream printer = new PrintStream(OutputStream.nullOutputStream());
+        Board board = new Board(board2D, printer);
 
-        String msg = "Hello!";
-
-        sendJson(exchange, 201, buildStateJson(session, msg));
-    }
-
-    private void handleGetGame(HttpExchange exchange, String id) throws IOException {
-        GameSession session = manager.getSession(id);
-        if (session == null) {
-            sendJson(exchange, 404, "{\"ERROR\":\"Session not found\"}");
-            return;
-        }
-        String msg = turnMessage(session);
-        sendJson(exchange, 200, buildStateJson(session, msg));
-    }
-
-    private void handleMove(HttpExchange exchange, String id) throws IOException {
-        GameSession session = manager.getSession(id);
-        if (session == null) {
-            sendJson(exchange, 404, "{\"ERROR\":\"Session not found\"}");
+        // check valid move
+        if (pos < 1 || pos > 9) {
+            sendJson(exchange, 400, "{\"error\":\"Please, input a valid number [1-9]\"}");
             return;
         }
 
-        String body = readBody(exchange);
-        int pos;
-        try {
-            pos = parseIntField(body, "position");
-        } catch (NumberFormatException e) {
-            sendJson(exchange, 400, "{\"error\":\"Body must contain \\\"position\\\" (1-9)\"}");
+        if (!board.placeMove(pos, 1)) {
+            sendJson(exchange, 400, "{\"error\":\"This cell is occupied, please choose another cell!\"}");
             return;
         }
 
-        String error = session.humanMove(pos);
-        if (error != null) {
-             sendJson(exchange, 400, "{\"ERROR\":\"" + escapeJson(error) + "\"}");
-             return;
-        }
-
-        String msg = switch (session.getStatus()) {
-            case HUMAN_WIN -> "Player 1 win";
-            case AI_WIN ->  "Player 2 win";
-            case DRAW ->  "Draw";
-            default -> turnMessage(session);
-        };
-
-        sendJson(exchange, 200, buildStateJson(session, msg));
-    }
-
-    private void handleDelete(HttpExchange exchange, String id) throws IOException {
-        if (manager.getSession(id) == null) {
-            sendJson(exchange, 404, "{\"ERROR\":\"Session not found\"}");
+        // check human winning/draw
+        if (board.checkWin(pos, 1)) {
+            sendJson(exchange, 200, buildStateJson(board, "HUMAN_WIN", "Player 1 won"));
             return;
         }
-        manager.removeSession(id);
-        sendJson(exchange, 200, "{\"message\":\"Session removed\"}");
+
+        if (board.isFull()) {
+            sendJson(exchange, 200, buildStateJson(board, "DRAW", "Draw"));
+            return;
+        }
+
+        // Ai turn
+        AIPlayer aiPlayer = new AIPlayer(2, printer);
+        int aiPos = aiPlayer.takeTurn(board);
+
+        // check winning/draw after ai turn
+        if (board.checkWin(aiPos, 2)) {
+            sendJson(exchange, 200, buildStateJson(board, "AI_WIN", "Player 2 win"));
+        } else if (board.isFull()) {
+            sendJson(exchange, 200, buildStateJson(board, "DRAW", "Draw"));
+        } else {
+            sendJson(exchange, 200, buildStateJson(board, "CONTINUE", "Player#1's turn"));
+        }
     }
 
     // ===========================
     // JSON
     // ===========================
-    private String buildStateJson(GameSession session, String message) {
-        int[] board = session.getSnapshot();
-        String boardArr = Arrays.toString(board);
+    private String buildStateJson(Board board, String status, String message) {
+        int[] flatBoard = new int[9];
+        int[][] board2D = board.getCells();
+
+        for (int i = 0; i < 9; i++) {
+            flatBoard[i] = board2D[i / 3][i % 3];
+        }
 
         return "{"
-                + "\"gameId\":\"" + session.getId() + "\","
-                + "\"board\":" + boardArr + ","
-                + "\"status\":\"" + session.getStatus() + "\","
-                + "\"humanTurn\":" + session.isHumanTurn() + ","
+                + "\"board\":" + Arrays.toString(flatBoard) + ","
+                + "\"status\":\"" + status + "\","
                 + "\"message\":\"" + escapeJson(message) + "\""
                 + "}";
-    }
-
-    private String turnMessage(GameSession session) {
-        return session.isHumanTurn() ? "Player#1's turn" :  "Player#2's turn";
     }
 
     // =======================
@@ -193,17 +156,20 @@ public class HTTPServer {
         }
     }
 
+    private int[] parseBoardField(String json) {
+        String[] token = json.substring(json.indexOf("[") + 1, json.indexOf("]")).split(",");
+        int[] board = new int[token.length];
+        for (int i = 0; i < token.length; i++) {
+            board[i] = Integer.parseInt(token[i]);
+        }
+        return board;
+    }
+
     private int parseIntField(String json, String field) {
         Pattern pattern = Pattern.compile("\"" + field + "\"\\s*:\\s*(-?\\d+)");
         Matcher matcher = pattern.matcher(json);
         if (!matcher.find()) throw new NumberFormatException("field not found: " + field);
         return Integer.parseInt(matcher.group(1));
-    }
-
-    private String extractGroup(Pattern p, String input, int group) {
-        Matcher m = p.matcher(input);
-        if (!m.matches()) throw new IllegalArgumentException("no match");
-        return m.group(group);
     }
 
     private String escapeJson(String input) {

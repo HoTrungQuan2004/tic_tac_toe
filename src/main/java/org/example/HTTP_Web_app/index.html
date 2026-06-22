@@ -48,7 +48,7 @@
     const BASE_URL = 'http://localhost:8080';
 
 <!--       State-->
-    let gameId     = null;
+    let currentBoard = [0, 0, 0, 0, 0, 0, 0, 0, 0];
     let gameOver   = false;
 
 <!--       DOM refs-->
@@ -108,25 +108,21 @@
 
 <!--       Game-state update-->
     function applyState(data) {
-        const s = data.status;        // ONGOING | HUMAN_WIN | AI_WIN | DRAW
-        const board     = data.board; // int[9]
-        const humanTurn = data.humanTurn;
+        const s = data.status;        // CONTINUE | HUMAN_WIN | AI_WIN | DRAW
+        currentBoard = data.board;
         const msg       = data.message;
 
-        gameOver = (s !== 'ONGOING');
+        gameOver = (s !== 'CONTINUE');
 
         if (gameOver) {
             const cls = s === 'HUMAN_WIN' ? 'win'
                       : s === 'AI_WIN'    ? 'lose'
                       : 'draw';
             setStatus(msg, cls);
-            renderBoard(board, false);
-        } else if (humanTurn) {
-            setStatus("Your turn (X) — pick a cell", 'your-turn');
-            renderBoard(board, true);
+            renderBoard(currentBoard, false);
         } else {
-            setStatus("AI is thinking... (O)", 'ai-turn');
-            renderBoard(board, false);
+            setStatus("Player#1's turn", 'your-turn');
+            renderBoard(currentBoard, true);
         }
     }
 
@@ -134,20 +130,25 @@
 <!--       Actions-->
     async function startGame() {
         const humanFirst = document.querySelector('input[name="first"]:checked').value === 'human';
-        setStatus('Creating game...', '');
 
-        try {
-            const { status, data } = await apiPost('/game', { humanFirst });
-            if (status !== 201) throw new Error(data.ERROR ?? 'Server error');
+        currentBoard = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+        gameOver   = false;
 
-            gameId = data.gameId;
+        setupPanel.classList.add('hidden');
+        gameUi.classList.remove('hidden');
 
-            setupPanel.classList.add('hidden');
-            gameUi.classList.remove('hidden');
-
-            applyState(data);
-        } catch (e) {
-            setStatus('Error: ' + e.message, 'error');
+        if (humanFirst) {
+            const mockData = { board: currentBoard, status: 'CONTINUE', message: "Player#1's turn" };
+            applyState(mockData);
+        } else {
+            setStatus('AI is thinking for the first move...', "Player#2's turn");
+            try {
+                const { status, data } = await apiPost('/game/move', { board: currentBoard, position: 0 });
+                if (status !== 200) throw new Error(data.ERROR ?? 'Server error');
+                applyState(data);
+            } catch (e) {
+                setStatus('Error: ' + e.message, 'error');
+            }
         }
     }
 
@@ -155,7 +156,7 @@
         if (gameOver) return;
         setStatus('Sending move...', '');
         try {
-            const { status, data } = await apiPost('/game/' + gameId + '/move', { position });
+            const { status, data } = await apiPost('/game/move', { board: currentBoard, position: position });
             if (status !== 200) {
                 setStatus(data.ERROR ?? 'Invalid move', 'error');
                 return;
@@ -167,13 +168,8 @@
     }
 
     async function endGame() {
-        if (!gameId) return;
-        try {
-            await apiDelete('/game/' + gameId);
-        } catch (_) { /* ignore */ }
-
-        gameId   = null;
         gameOver = false;
+        currentBoard = [0, 0, 0, 0, 0, 0, 0, 0, 0];
         boardEl.innerHTML = '';
         setStatus('');
         gameUi.classList.add('hidden');
