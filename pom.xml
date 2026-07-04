@@ -40,42 +40,17 @@
                 <version>3.4.0</version>
                 <configuration>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
+                    
+                    <packagingIncludes>
+                        index.html,
+                        Style.css,
+                        WEB-INF/classes/org/example/Board.class,
+                        WEB-INF/classes/org/example/Player.class,
+                        WEB-INF/classes/org/example/AIPlayer.class,
+                        WEB-INF/classes/org/example/HTTP_Web_app/GameServlet.class,
+                        WEB-INF/web.xml
+                    </packagingIncludes>
                 </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.5.1</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <finalName>tic-tac-toe-server</finalName>
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>org.example.HTTP_Web_app.HTTPServer</mainClass>
-                                </transformer>
-                            </transformers>
-                            <filters>
-                                <filter>
-                                    <artifact>*:*</artifact>
-                                    <includes>
-                                        <include>org/example/HTTP_Web_app/GameServlet.class</include>
-                                        <include>org/example/Board.class</include>
-                                        <include>org/example/Player.class</include>
-                                        <include>org/example/AIPlayer.class</include>
-                                        <include>index.html</include>
-                                        <include>Style.css</include>
-                                    </includes>
-                                </filter>
-                            </filters>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

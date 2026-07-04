@@ -1,0 +1,58 @@
+Base URL context path: /tic_tac_toe-1.0-SNAPSHOT
+
+1. Game move endpoint
+- path: /game/move
+- Methoc: POST
+- Description: Processes the human player's move, updates the board state, checks for game-ending conditions (win/draw), triggers the AI player's counter-move if the game continues, checks for game-ending conditions for the AI, and returns the final updated board.
+- Expected request's body:
+    {
+        "board": [0, 0, 0, 0, 0, 0, 0, 0, 0],  // 0 = Empty, 1 = X/Human, 2 = O/AI
+        "position": 5                         // Integer from 1 to 9 corresponding to the cell chosen by the player
+    }
+- Expected Response's body:
+    + Success scenario (HTTP Status 200 OK):
+        * Sends back the updated flat board array, game status, and a display message.
+
+        * Possible statuses: "CONTINUE" | "HUMAN_WIN" | "AI_WIN" | "DRAW"
+
+        * Example Game continue:
+        {
+           "board": [2, 0, 0, 0, 1, 0, 0, 0, 0],
+           "status": "CONTINUE",
+           "message": "Player#1's turn"
+        }
+
+        * Example Human wins:
+        {
+           "board": [1, 1, 1, 0, 2, 2, 0, 0, 0],
+           "status": "HUMAN_WIN",
+           "message": "Player 1 won"
+        }
+    + Error scenario (HTTP Status 400 Bad Request)
+        * Sends back an error object if validation fails or json is malformed.
+       
+        * Example Malformed Request Body / Type Mismatch:
+        {
+           "error": "Malformed request body"
+        }
+       
+        * Example Invalid Cell / Number Out of Bounds:
+        {
+           "error": "Please, input a valid number [1-9]"
+        }
+       
+        * Example Cell Already Taken:
+        {
+           "error": "This cell is occupied, please choose another cell!"
+        }
+
+2. CORS preflight endpoint
+- Path: /game/move
+- Method: OPTIONS
+- Description: Handles preflight CORS requests from modern web browsers to verify cross-origin resource sharing permissions. 
+- Expected request's body: NONE
+- Expected Response's body: (HTTP Status 204 No Content)
+    Empty response body with CORS headers attached:
+    - Access-Control-Allow-Origin: "*"
+    - Access-Control-Allow-Methods: "GET, POST, OPTIONS"
+    - Access-Control-Allow-Headers: "Content-Type"
