@@ -8,7 +8,7 @@
     <artifactId>tic_tac_toe</artifactId>
     <version>1.0-SNAPSHOT</version>
     
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
 
     <properties>
         <maven.compiler.source>25</maven.compiler.source>
@@ -24,6 +24,7 @@
             <version>6.0.3</version>
             <scope>test</scope>
         </dependency>
+        
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
@@ -36,21 +37,37 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>3.4.0</version>
-                <configuration>
-                    <failOnMissingWebXml>false</failOnMissingWebXml>
-                    
-                    <packagingIncludes>
-                        index.html,
-                        Style.css,
-                        WEB-INF/classes/org/example/Board.class,
-                        WEB-INF/classes/org/example/Player.class,
-                        WEB-INF/classes/org/example/AIPlayer.class,
-                        WEB-INF/classes/org/example/HTTP_Web_app/GameServlet.class,
-                        WEB-INF/web.xml
-                    </packagingIncludes>
-                </configuration>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.5.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <includes>
+                                        <include>org/example/Board.class</include>
+                                        <include>org/example/Player.class</include>
+                                        <include>org/example/AIPlayer.class</include>
+                                        
+                                        <include>org/example/HTTP/Servers/HttpServerSide.class</include>
+                                        <include>org/example/HTTP/Servers/HttpGameController.class</include>
+                                        <include>org/example/HTTP/Clients/HttpClientSide.class</include>
+                                    </includes>
+                                </filter>
+                            </filters>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>org.example.HTTP.Servers.HttpServerSide</mainClass>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
