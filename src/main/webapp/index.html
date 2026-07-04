@@ -1,186 +1,166 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tic-Tac-Toe</title>
     <link rel="stylesheet" href="Style.css" />
 </head>
+
 <body>
 
-<header>
-    <h1>Tic-Tac-Toe</h1>
-</header>
+    <header>
+        <h1>Tic-Tac-Toe</h1>
+    </header>
 
-<div class="card">
+    <div class="card">
 
-    <div id="setup-panel">
-        <label>Who goes first?</label>
-        <div class="radio-group">
-            <input type="radio" id="opt-human" name="first" value="human" checked />
-            <label for="opt-human">You (X)</label>
-
-            <input type="radio" id="opt-ai" name="first" value="ai" />
-            <label for="opt-ai">AI (O)</label>
-        </div>
-        <button class="btn primary" id="btn-start">Start Game</button>
-    </div>
-
-    <div id="game-ui" class="hidden">
-
-        <div id="status-bar">Waiting...</div>
-
-        <div id="board">
+        <div id="setup-panel">
+            <label>You are X, the computer is O - You go first</label>
+            <button class="btn primary" id="btn-start">Start Game</button>
         </div>
 
-        <div class="controls">
-            <button class="btn danger" id="btn-end">End Game</button>
+        <div id="game-ui" class="hidden">
+
+            <div id="status-bar">Waiting...</div>
+
+            <div id="board"></div>
+
+            <div class="controls">
+                <button class="btn danger" id="btn-end">End Game</button>
+            </div>
+
         </div>
 
     </div>
 
-</div>
+    <footer>Connects to <code>/game/move</code> servlet</footer>
 
-<footer>Connects to HTTP server on <code>localhost:8080</code></footer>
+    <script>
+        // <!--       Configuration-->
+        const BASE_URL = '';
 
-<script>
-<!--       Configuration-->
-    const BASE_URL = 'http://localhost:8080';
+        // <!--       State-->
+        let currentBoard = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+        let gameOver = false;
 
-<!--       State-->
-    let currentBoard = [0, 0, 0, 0, 0, 0, 0, 0, 0];
-    let gameOver   = false;
-
-<!--       DOM refs-->
-    const setupPanel  = document.getElementById('setup-panel');
-    const gameUi      = document.getElementById('game-ui');
-    const statusBar   = document.getElementById('status-bar');
-    const boardEl     = document.getElementById('board');
-    const btnStart    = document.getElementById('btn-start');
-    const btnEnd      = document.getElementById('btn-end');
+        // <!--       DOM refs-->
+        const setupPanel = document.getElementById('setup-panel');
+        const gameUi = document.getElementById('game-ui');
+        const statusBar = document.getElementById('status-bar');
+        const boardEl = document.getElementById('board');
+        const btnStart = document.getElementById('btn-start');
+        const btnEnd = document.getElementById('btn-end');
 
 
-<!--       API helpers-->
-    async function apiPost(path, body = null) {
-        const opts = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-        };
-        if (body !== null) opts.body = JSON.stringify(body);
-        const res = await fetch(BASE_URL + path, opts);
-        return { status: res.status, data: await res.json() };
-    }
+        // <!--       API helpers-->
+        async function apiPost(path, body) {
+            const res = await fetch(BASE_URL + path, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
 
-    async function apiDelete(path) {
-        const res = await fetch(BASE_URL + path, { method: 'DELETE' });
-        return { status: res.status, data: await res.json() };
-    }
-
-
-<!--       Board rendering-->
-    const SYMBOLS = { 0: '', 1: 'X', 2: 'O' };
-
-    function renderBoard(board, allowClick) {
-        boardEl.innerHTML = '';
-        board.forEach((val, idx) => {
-            const cell = document.createElement('div');
-            cell.className = 'cell';
-            cell.textContent = SYMBOLS[val] ?? '';
-            if (val !== 0) {
-                cell.dataset.val = val;
-                cell.classList.add('taken');
-            } else if (!allowClick) {
-                cell.classList.add('disabled');
-            } else {
-                cell.addEventListener('click', () => onCellClick(idx + 1));
+            const contentType = res.headers.get('Content-Type') || '';
+            if (!contentType.includes('application/json')) {
+                throw new Error('Invalid response from server: ' + await res.text());
             }
-            boardEl.appendChild(cell);
-        });
-    }
+
+            return { status: res.status, data: await res.json() };
+        }
+
+        // <!--       Board rendering-->
+        const SYMBOLS = { 0: '', 1: 'X', 2: 'O' };
+
+        function renderBoard(board, allowClick) {
+            boardEl.innerHTML = '';
+            board.forEach((val, idx) => {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.textContent = SYMBOLS[val] ?? '';
+                if (val !== 0) {
+                    cell.dataset.val = val;
+                    cell.classList.add('taken');
+                } else if (!allowClick) {
+                    cell.classList.add('disabled');
+                } else {
+                    cell.addEventListener('click', () => onCellClick(idx + 1));
+                }
+                boardEl.appendChild(cell);
+            });
+        }
 
 
-<!--       Status bar helpers-->
-    function setStatus(text, cls = '') {
-        statusBar.textContent = text;
-        statusBar.className = cls;
-    }
+        // <!--       Status bar helpers-->
+        function setStatus(text, cls = '') {
+            statusBar.textContent = text;
+            statusBar.className = cls;
+        }
 
 
-<!--       Game-state update-->
-    function applyState(data) {
-        const s = data.status;        // CONTINUE | HUMAN_WIN | AI_WIN | DRAW
-        currentBoard = data.board;
-        const msg       = data.message;
+        // <!--       Game-state update-->
+        function applyState(data) {
+            const s = data.status;        // CONTINUE | HUMAN_WIN | AI_WIN | DRAW
+            currentBoard = data.board;
+            const msg = data.message;
 
-        gameOver = (s !== 'CONTINUE');
+            gameOver = (s !== 'CONTINUE');
 
-        if (gameOver) {
-            const cls = s === 'HUMAN_WIN' ? 'win'
-                      : s === 'AI_WIN'    ? 'lose'
-                      : 'draw';
-            setStatus(msg, cls);
-            renderBoard(currentBoard, false);
-        } else {
+            if (gameOver) {
+                const cls = s === 'HUMAN_WIN' ? 'win'
+                    : s === 'AI_WIN' ? 'lose'
+                        : 'draw';
+                setStatus(msg, cls);
+                renderBoard(currentBoard, false);
+            } else {
+                setStatus("Player#1's turn", 'your-turn');
+                renderBoard(currentBoard, true);
+            }
+        }
+
+        // <!--       Actions-->
+        async function startGame() {
+            currentBoard = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+            gameOver = false;
+
+            setupPanel.classList.add('hidden');
+            gameUi.classList.remove('hidden');
+
             setStatus("Player#1's turn", 'your-turn');
             renderBoard(currentBoard, true);
         }
-    }
 
-
-<!--       Actions-->
-    async function startGame() {
-        const humanFirst = document.querySelector('input[name="first"]:checked').value === 'human';
-
-        currentBoard = [0, 0, 0, 0, 0, 0, 0, 0, 0];
-        gameOver   = false;
-
-        setupPanel.classList.add('hidden');
-        gameUi.classList.remove('hidden');
-
-        if (humanFirst) {
-            const mockData = { board: currentBoard, status: 'CONTINUE', message: "Player#1's turn" };
-            applyState(mockData);
-        } else {
-            setStatus('AI is thinking for the first move...', "Player#2's turn");
+        async function onCellClick(position) {
+            if (gameOver) return;
+            setStatus('Sending move...', '');
             try {
-                const { status, data } = await apiPost('/game/move', { board: currentBoard, position: 0 });
-                if (status !== 200) throw new Error(data.ERROR ?? 'Server error');
+                const { status, data } = await apiPost('game/move', { board: currentBoard, position });
+                if (status !== 200) {
+                    setStatus(data.error ?? 'Invalid move', 'error');
+                    return;
+                }
                 applyState(data);
             } catch (e) {
                 setStatus('Error: ' + e.message, 'error');
             }
         }
-    }
 
-    async function onCellClick(position) {
-        if (gameOver) return;
-        setStatus('Sending move...', '');
-        try {
-            const { status, data } = await apiPost('/game/move', { board: currentBoard, position: position });
-            if (status !== 200) {
-                setStatus(data.ERROR ?? 'Invalid move', 'error');
-                return;
-            }
-            applyState(data);
-        } catch (e) {
-            setStatus('Error: ' + e.message, 'error');
+        async function endGame() {
+            gameOver = false;
+            currentBoard = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+            boardEl.innerHTML = '';
+            setStatus('');
+            gameUi.classList.add('hidden');
+            setupPanel.classList.remove('hidden');
         }
-    }
-
-    async function endGame() {
-        gameOver = false;
-        currentBoard = [0, 0, 0, 0, 0, 0, 0, 0, 0];
-        boardEl.innerHTML = '';
-        setStatus('');
-        gameUi.classList.add('hidden');
-        setupPanel.classList.remove('hidden');
-    }
 
 
-<!--       Event listeners-->
-    btnStart.addEventListener('click', startGame);
-    btnEnd.addEventListener('click', endGame);
-</script>
+        // <!--       Event listeners-->
+        btnStart.addEventListener('click', startGame);
+        btnEnd.addEventListener('click', endGame);
+    </script>
 
 </body>
+
 </html>

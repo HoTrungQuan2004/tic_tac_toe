@@ -24,6 +24,12 @@
             <version>6.0.3</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>5.0.0</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -58,7 +64,7 @@
                                 <filter>
                                     <artifact>*:*</artifact>
                                     <includes>
-                                        <include>org/example/HTTP_Web_app/HTTPServer.class</include>
+                                        <include>org/example/HTTP_Web_app/GameServlet.class</include>
                                         <include>org/example/Board.class</include>
                                         <include>org/example/Player.class</include>
                                         <include>org/example/AIPlayer.class</include>
