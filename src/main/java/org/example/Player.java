@@ -1,7 +1,6 @@
 package org.example;
 
 import java.io.PrintStream;
-import java.util.Scanner;
 
 public abstract class Player {
     protected final int id;
