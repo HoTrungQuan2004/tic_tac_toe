@@ -1,15 +1,21 @@
 package org.example.RESTful.Clients;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Scanner;
 
 public class NaiveClient {
-    private static int[][] localBoard = {{0,0,0},{0,0,0},{0,0,0}};
-    private static final HttpClient httpClient = HttpClient.newHttpClient();
+    private static final String HOST = "localhost";
+    private static final int PORT = 8080;
+    private static final String PATH = "/api/game/turn";
+
+    private static int[][] localBoard = { { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 } };
 
     public static void main(String args[]) {
         Scanner scanner = new Scanner(System.in);
@@ -70,16 +76,50 @@ public class NaiveClient {
     }
 
     private static String sendMoveToServer(int[][] board, int pos) throws Exception {
-        String jsonPayload = String.format("{\"board\":%s,\"position\":%d}", Arrays.deepToString(board).replace(" ", ""), pos);
+        String jsonPayload = String.format("{\"board\":%s,\"position\":%d}",
+                Arrays.deepToString(board).replace(" ", ""), pos);
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/api/game/turn"))
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
-                .build();
+        byte[] payloadBytes = jsonPayload.getBytes(StandardCharsets.UTF_8);
 
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        return response.body();
+        try (Socket socket = new Socket(HOST, PORT)) {
+            OutputStream out = socket.getOutputStream();
+
+            String requestHeader = "POST " + PATH + " HTTP/1.1\r\n" +
+                    "Host: " + HOST + "\r\n" +
+                    "Content-Type: application/json\r\n" +
+                    "Content-Length: " + payloadBytes.length + "\r\n" +
+                    "Connection: close\r\n" +
+                    "\r\n";
+
+            out.write(requestHeader.getBytes(StandardCharsets.UTF_8));
+            out.write(payloadBytes);
+            out.flush();
+
+            return readBodyFromResponse(socket.getInputStream());
+        }
+    }
+
+    private static String readBodyFromResponse(InputStream in) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+
+        String statusLine = reader.readLine();
+        if (statusLine == null)
+            throw new IOException("No response from server");
+
+        int contentLength = 0;
+        String line;
+        while ((line = reader.readLine()) != null && !line.isEmpty()) {
+            if (line.toLowerCase().startsWith("content-length:")) {
+                contentLength = Integer.parseInt(line.split(":")[1].trim());
+            }
+        }
+
+        char[] bodyChars = new char[contentLength];
+        if (contentLength > 0) {
+            reader.read(bodyChars, 0, contentLength);
+        }
+
+        return new String(bodyChars);
     }
 
     public static void printLocalBoard() {
@@ -95,7 +135,8 @@ public class NaiveClient {
     private static String parseJsonField(String json, String field) {
         String key = "\"" + field + "\":\"";
         int start = json.indexOf(key);
-        if (start == -1) return null;
+        if (start == -1)
+            return null;
         start += key.length();
         int end = json.indexOf("\"", start);
         return json.substring(start, end);
